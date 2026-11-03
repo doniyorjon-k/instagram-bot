@@ -47,7 +47,7 @@ Shundan keyin bot faqat sizning buyruqlaringizni qabul qiladi.
 ### 3. Matn yozuvchi
 `GEMINI_API_KEY` ni qo'shing (bepul). Claude'ga o'tmoqchi bo'lsangiz, `ANTHROPIC_API_KEY` qo'shing va
 **Variables** bo'limida `LLM_PROVIDER` = `claude` qiling. Gemini modelini `GEMINI_MODEL` o'zgaruvchisi bilan
-almashtirish mumkin (standart: `gemini-2.5-flash`).
+almashtirish mumkin (standart: `gemini-3.8-flash`).
 
 ### 4. Instagram
 Instagram rasmni faqat ochiq URL orqali qabul qiladi. Shuning uchun repo **public** bo'lishi kerak:

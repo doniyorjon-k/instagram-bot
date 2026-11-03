@@ -114,7 +114,7 @@ def _gemini(prompt: str) -> str:
 
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
     resp = client.models.generate_content(
-        model=os.environ.get("GEMINI_MODEL") or "gemini-2.5-flash",
+        model=os.environ.get("GEMINI_MODEL") or "gemini-3.8-flash",
         contents=prompt,
         config=types.GenerateContentConfig(
             system_instruction=SYSTEM,
