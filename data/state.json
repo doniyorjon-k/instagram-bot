@@ -3,8 +3,9 @@
   "posts": {
     "01": {
       "status": "regen",
-      "attempts": 0,
-      "feedback": null
+      "attempts": 1,
+      "feedback": null,
+      "last_error": "matn/rasm: model is required."
     },
     "02": {
       "status": null,
