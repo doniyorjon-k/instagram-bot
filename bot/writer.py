@@ -109,19 +109,34 @@ def full_caption(c: dict) -> str:
 # ---------- providers ----------
 
 def _gemini(prompt: str) -> str:
+    """Gemini with Google Search when the key allows it.
+
+    On the free tier, Search grounding is not available for Gemini 3+ models and
+    returns 429/400, so we retry once without the search tool.
+    """
     from google import genai
-    from google.genai import types
+    from google.genai import errors, types
 
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
-    resp = client.models.generate_content(
-        model=os.environ.get("GEMINI_MODEL") or "gemini-3.8-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM,
-            tools=[types.Tool(google_search=types.GoogleSearch())],
-        ),
-    )
-    return resp.text or ""
+    model = os.environ.get("GEMINI_MODEL") or "gemini-3.8-flash"
+    search = os.environ.get("GEMINI_SEARCH", "auto").lower() != "off"
+
+    def ask(with_search: bool) -> str:
+        tools = [types.Tool(google_search=types.GoogleSearch())] if with_search else None
+        resp = client.models.generate_content(
+            model=model, contents=prompt,
+            config=types.GenerateContentConfig(system_instruction=SYSTEM, tools=tools),
+        )
+        return resp.text or ""
+
+    if search:
+        try:
+            return ask(True)
+        except errors.ClientError as e:
+            if e.code not in (400, 403, 429):
+                raise
+            print(f"Gemini search unavailable ({e.code}), retrying without search")
+    return ask(False)
 
 
 def _claude(prompt: str) -> str:
