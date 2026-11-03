@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="uz"><head><meta charset="utf-8">
+<style>
+@font-face{font-family:'Inter';src:url('../assets/fonts/Inter-Regular.otf');font-weight:400}
+@font-face{font-family:'Inter';src:url('../assets/fonts/Inter-Medium.otf');font-weight:500}
+@font-face{font-family:'Inter';src:url('../assets/fonts/Inter-SemiBold.otf');font-weight:600}
+@font-face{font-family:'Inter Display';src:url('../assets/fonts/InterDisplay-Light.otf');font-weight:300}
+@font-face{font-family:'Inter Display';src:url('../assets/fonts/InterDisplay-Regular.otf');font-weight:400}
+@font-face{font-family:'Inter Display';src:url('../assets/fonts/InterDisplay-SemiBold.otf');font-weight:600}
+@font-face{font-family:'Inter Display';src:url('../assets/fonts/InterDisplay-Bold.otf');font-weight:700}
+:root{--ink:#0B1F14;--body:#4A5550;--muted:#9AA39D;--green:#15803D;--deep:#0F5F33;--mist:#F3F7F4}
+*{margin:0;box-sizing:border-box}
+body{font-family:'Inter';background:#ccc}
+.s{width:1080px;height:1350px;position:relative;overflow:hidden;background:#fff;color:var(--ink)}
+.hdr{position:absolute;top:72px;left:88px;right:88px;display:flex;justify-content:space-between;align-items:center;font-size:26px;font-weight:500;z-index:3}
+.brand{display:flex;align-items:center;gap:14px;font-family:'Inter Display';font-weight:700;font-size:30px;letter-spacing:-.5px}
+.brand img{width:64px}
+.pg{color:var(--muted);letter-spacing:1px}
+.foot{position:absolute;bottom:72px;left:88px;right:88px;display:flex;justify-content:space-between;align-items:center;font-size:26px;color:var(--muted);z-index:3}
+.swipe{color:var(--ink);font-weight:600}
+.label{display:flex;align-items:center;gap:12px;color:var(--green);font-weight:600}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--green)}
+.fit{overflow:hidden}
+
+/* cover */
+.cover{background:var(--mist)}
+.cover .q{position:absolute;left:88px;right:88px;top:250px;height:620px;font-family:'Inter Display';font-weight:600;font-size:132px;line-height:1.0;letter-spacing:-.034em}
+.cover .mark{display:inline-block;background:var(--deep);color:#fff;padding:0 .17em .05em;border-radius:.14em;margin:.08em 0}
+.cover .card{position:absolute;left:88px;right:88px;bottom:190px;background:#fff;border-radius:36px;padding:44px 48px;display:flex;justify-content:space-between;align-items:center;gap:32px;box-shadow:0 20px 50px rgba(11,31,20,.07)}
+.cover .card .t{font-size:34px;line-height:1.35;color:var(--body);height:138px;display:flex;align-items:center}
+.cover .card .t b{color:var(--ink);font-weight:600}
+.cover .arrow{flex:none;width:110px;height:110px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:54px}
+
+/* inner */
+.inner .num{position:absolute;top:290px;left:88px;font-family:'Inter Display';font-weight:300;font-size:180px;line-height:1;color:var(--green);letter-spacing:-6px}
+.inner .h{position:absolute;top:520px;left:88px;right:88px;height:250px;font-family:'Inter Display';font-weight:600;font-size:84px;line-height:1.05;letter-spacing:-.03em;display:flex;align-items:flex-end}
+.inner .rule{position:absolute;top:800px;left:88px;width:96px;height:4px;background:var(--green)}
+.inner .b{position:absolute;top:850px;left:88px;right:120px;height:300px;font-size:38px;line-height:1.45;color:var(--body)}
+
+/* cta */
+.cta{background:var(--deep);color:#fff}
+.cta .pg{color:rgba(255,255,255,.55)}
+.cta .ring{position:absolute;right:-260px;top:-260px;width:760px;height:760px;border-radius:50%;border:2px solid rgba(255,255,255,.12)}
+.cta .ring2{position:absolute;right:-140px;top:-140px;width:520px;height:520px;border-radius:50%;border:2px solid rgba(255,255,255,.12)}
+.cta .h{position:absolute;top:330px;left:88px;right:88px;height:330px;font-family:'Inter Display';font-weight:600;font-size:96px;line-height:1.02;letter-spacing:-.031em;display:flex;align-items:flex-end}
+.cta .b{position:absolute;top:710px;left:88px;right:160px;height:220px;font-size:38px;line-height:1.45;color:rgba(255,255,255,.78)}
+.cta .btn{position:absolute;top:960px;left:88px;background:#fff;color:var(--deep);font-family:'Inter Display';font-weight:700;font-size:44px;padding:30px 48px;border-radius:999px;display:flex;gap:18px;align-items:center}
+.cta .alt{position:absolute;top:1100px;left:96px;font-size:32px;color:rgba(255,255,255,.7)}
+.cta .alt b{color:#fff;font-weight:600}
+</style></head>
+<body>
+<!--SLIDES-->
+<script>
+// Shrink text inside each .fit box until it fits; never below data-min px.
+document.fonts.ready.then(() => {
+  // For flex boxes the text sits in a child span; measure that, not scrollHeight.
+  const need = el => {
+    const c = el.firstElementChild;
+    return (c && getComputedStyle(el).display === 'flex') ? c.getBoundingClientRect().height : el.scrollHeight;
+  };
+  for (const el of document.querySelectorAll('.fit')) {
+    const min = parseFloat(el.dataset.min || '24');
+    let size = parseFloat(getComputedStyle(el).fontSize);
+    while (need(el) > el.clientHeight + 2 && size > min) {
+      size -= 2; el.style.fontSize = size + 'px';
+    }
+    el.dataset.fitted = need(el) <= el.clientHeight + 2 ? 'ok' : 'overflow';
+  }
+  document.body.dataset.ready = '1';
+});
+</script>
+</body></html>
