@@ -2,10 +2,20 @@
   "tg_offset": 904885756,
   "posts": {
     "01": {
-      "status": "regen",
+      "status": "draft_sent",
       "attempts": 0,
       "feedback": null,
-      "last_error": "matn/rasm: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+      "last_error": null,
+      "drafted_at": "2026-11-04T03:17:32.924401+05:00",
+      "tg_messages": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
     },
     "02": {
       "status": null,

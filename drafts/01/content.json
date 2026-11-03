@@ -1,0 +1,49 @@
+{
+  "label": "Platforma haqida qisqacha",
+  "cover": {
+    "line1": "Ot va jihozlar",
+    "highlight": "savdosi endi",
+    "line3": "bitta joyda.",
+    "card_bold": "Otbozor platformasi",
+    "card_text": "Ot ishqibozlari va sotuvchilarni birlashtiruvchi zamonaviy loyiha."
+  },
+  "slides": [
+    {
+      "title": "Ishonchli e'lonlar bazasi",
+      "body": "Platformada otlar, ot jihozlari va parvarish bo'yicha saralangan e'lonlar joylashtiriladi. Barcha ma'lumotlar ochiq va tushunarli beriladi."
+    },
+    {
+      "title": "Bozor narxlarini kuzating",
+      "body": "Chopqir, ko'pkari yoki nasldor otlarning joriy bozor narxlarini solishtiring hamda o'zingizga ma'qul taklifni osongina tanlang."
+    },
+    {
+      "title": "To'g'ridan-to'g'ri aloqa",
+      "body": "Ortiqcha vositachilarsiz sotuvchi yoki xaridor bilan to'g'ridan-to mezonlar bo'yicha bog'laning. Shartlarni o'zingiz bevosita kelishasiz."
+    },
+    {
+      "title": "Foydali bilim va maslahatlar",
+      "body": "Platformada ot parvarishi, to'g'ri oziqlantirish, ko'pkari tayyorgarligi va veterinariya bo'yicha sohaviy maqolalar berib boriladi."
+    }
+  ],
+  "cta": {
+    "title": "Bot orqali e'lon bering",
+    "body": "Telegram botimizga kiring, e'lonlarni ko'ring yoki o'z e mezonlaringiz bo'yicha e'lonni tezda joylashtiring."
+  },
+  "caption": "Ot xarid qilish yoki sotishda ishonchli va qulay vosita qidiryapsizmi?\n\nOtbozor platformasi O'zbekistondagi barcha ot ishqibozlari, ko'pkarichilar va naslchilik bilan shug'ullanuvchilarni bitta joyga jamlaydi. \n\nIlgari ot qidirish uchun har haftada bozorga borish yoki tanish-bilishlardan surishtirishga to'g'ri kelardi. Endilikda barcha e'lonlar bir joyda jamlangan. Sotuvchilar o'z otlari haqida to'liq ma'lumot, foto va videolarni joylashtirishi mumkin. Xaridorlar esa narxlarni solishtirib, to'g'ridan-to'g'ri ot egasi bilan bog'lanadi.\n\nPlatformada nafaqat otlar, balki egarlar, jilovlar va boshqa ot jihozlari e'lonlarini ham topasiz. Bundan tashqari, ot parvarishi va veterinariya sohasiga oid foydali tavsiyalar muntazam berib boriladi.",
+  "hashtags": [
+    "#otbozor",
+    "#otlar",
+    "#kopkari",
+    "#ulok",
+    "#otparvarishi",
+    "#otlarolami",
+    "#uzbekistonotlari",
+    "#tulpor",
+    "#zotdorotlar",
+    "#otjihozlari"
+  ],
+  "sources": [
+    "https://otbozor.uz"
+  ],
+  "full_caption": "Ot xarid qilish yoki sotishda ishonchli va qulay vosita qidiryapsizmi?\n\nOtbozor platformasi O'zbekistondagi barcha ot ishqibozlari, ko'pkarichilar va naslchilik bilan shug'ullanuvchilarni bitta joyga jamlaydi. \n\nIlgari ot qidirish uchun har haftada bozorga borish yoki tanish-bilishlardan surishtirishga to'g'ri kelardi. Endilikda barcha e'lonlar bir joyda jamlangan. Sotuvchilar o'z otlari haqida to'liq ma'lumot, foto va videolarni joylashtirishi mumkin. Xaridorlar esa narxlarni solishtirib, to'g'ridan-to'g'ri ot egasi bilan bog'lanadi.\n\nPlatformada nafaqat otlar, balki egarlar, jilovlar va boshqa ot jihozlari e'lonlarini ham topasiz. Bundan tashqari, ot parvarishi va veterinariya sohasiga oid foydali tavsiyalar muntazam berib boriladi.\n\nYangi e'lonlar va maslahatlar Telegram botimizda: @otbozor_bot\nSaytimiz: otbozor.uz\n\n#otbozor #otlar #kopkari #ulok #otparvarishi #otlarolami #uzbekistonotlari #tulpor #zotdorotlar #otjihozlari"
+}
