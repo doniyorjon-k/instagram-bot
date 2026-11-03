@@ -79,14 +79,38 @@ def build_html(content: dict) -> str:
     return page.replace("</head>", REEL_CSS + timing + "</head>").replace("</body>", REEL_JS + "</body>")
 
 
+QUIZ_TEMPLATE = ROOT / "templates" / "reel-quiz.html"
+
+
+def build_quiz_html(quiz: dict) -> str:
+    """quiz: q1, qmark, q2, a, b, right ("A"/"B"), why (may hold <b>), cta_title, cta_body."""
+    e = slides._e
+    right = quiz["right"].upper()
+    vals = {"Q1": e(quiz["q1"]), "QMARK": e(quiz["qmark"]), "Q2": e(quiz.get("q2", "")),
+            "A": e(quiz["a"]), "B": e(quiz["b"]), "RIGHT": right, "WRONG": "B" if right == "A" else "A",
+            "WHY": f"<b>{e(quiz['answer'])}</b> {e(quiz['why'])}",
+            "CTA_TITLE": e(quiz["cta_title"]), "CTA_BODY": e(quiz["cta_body"])}
+    out = QUIZ_TEMPLATE.read_text(encoding="utf-8")
+    for k, v in vals.items():
+        out = out.replace("{{" + k + "}}", v)
+    return out
+
+
 def render_reel(content: dict, out: Path, music: Path | None = None) -> Path:
+    return record(build_html(content), out, music)
+
+
+def render_quiz(quiz: dict, out: Path, music: Path | None = None) -> Path:
+    return record(build_quiz_html(quiz), out, music)
+
+
+def record(html_text: str, out: Path, music: Path | None = None) -> Path:
     from playwright.sync_api import sync_playwright
 
     out.parent.mkdir(parents=True, exist_ok=True)
     page_file = ROOT / "templates" / "_reel.html"
-    page_file.write_text(build_html(content), encoding="utf-8")
-    audio = (["-i", str(music), "-af", "afade=t=out:st=-2:d=2"] if music
-             else ["-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo"])
+    page_file.write_text(html_text, encoding="utf-8")
+    audio = (["-i", str(music)] if music else ["-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo"])
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(channel=os.environ.get("PW_CHANNEL") or None,
@@ -94,8 +118,7 @@ def render_reel(content: dict, out: Path, music: Path | None = None) -> Path:
             page = browser.new_page(viewport={"width": 1080, "height": 1920})
             page.goto(page_file.as_uri())
             page.wait_for_selector("body[data-reel='1']", timeout=30_000)
-            overflow = page.eval_on_selector_all(".fit[data-fitted='overflow']", "els => els.length")
-            if overflow:
+            if page.eval_on_selector_all(".fit[data-fitted='overflow']", "els => els.length"):
                 raise RuntimeError("Reels: matn sig'madi")
             total = page.evaluate("window.REEL_TOTAL")
             ff = subprocess.Popen(

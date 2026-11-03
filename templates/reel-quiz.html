@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="uz"><head><meta charset="utf-8">
+<style>
+@font-face{font-family:'Inter';src:url('../assets/fonts/Inter-Regular.otf');font-weight:400}
+@font-face{font-family:'Inter';src:url('../assets/fonts/Inter-Medium.otf');font-weight:500}
+@font-face{font-family:'Inter';src:url('../assets/fonts/Inter-SemiBold.otf');font-weight:600}
+@font-face{font-family:'Inter Display';src:url('../assets/fonts/InterDisplay-Light.otf');font-weight:300}
+@font-face{font-family:'Inter Display';src:url('../assets/fonts/InterDisplay-SemiBold.otf');font-weight:600}
+@font-face{font-family:'Inter Display';src:url('../assets/fonts/InterDisplay-Bold.otf');font-weight:700}
+:root{--ink:#0B1F14;--body:#4A5550;--muted:#9AA39D;--green:#15803D;--deep:#0F5F33;--mist:#F3F7F4;--line:#DCE5DF}
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;overflow:hidden;font-family:'Inter';color:var(--ink);background:var(--mist)}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--mist)}
+.hdr{position:absolute;top:250px;left:88px;right:88px;display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;align-items:center;gap:14px;font-family:'Inter Display';font-weight:700;font-size:34px}
+.brand img{width:72px}
+.pill{background:var(--deep);color:#fff;font-weight:600;font-size:28px;letter-spacing:2px;padding:12px 26px;border-radius:999px}
+.q{position:absolute;top:400px;left:88px;right:88px;font-family:'Inter Display';font-weight:600;font-size:104px;line-height:1.02;letter-spacing:-.034em}
+.q .mark{display:inline-block;background:var(--deep);color:#fff;padding:0 .17em .05em;border-radius:.14em}
+.opts{position:absolute;top:900px;left:88px;right:88px;display:flex;flex-direction:column;gap:28px}
+.opt{position:relative;background:#fff;border:3px solid var(--line);border-radius:36px;height:170px;display:flex;align-items:center;gap:36px;padding:0 44px;font-family:'Inter Display';font-weight:600;font-size:64px;letter-spacing:-.02em;overflow:hidden}
+.opt .k{flex:none;width:96px;height:96px;border-radius:50%;background:var(--mist);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:700}
+.opt .ok{position:absolute;right:44px;width:96px;height:96px;border-radius:50%;background:#fff;color:var(--green);display:flex;align-items:center;justify-content:center;font-size:56px;opacity:0}
+.opt.right{background:var(--green);border-color:var(--green);color:#fff}
+.opt.right .k{background:rgba(255,255,255,.18);color:#fff}
+.timer{position:absolute;top:1330px;left:50%;width:150px;height:150px;margin-left:-75px}
+.timer svg{width:150px;height:150px;transform:rotate(-90deg)}
+.timer .n{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Inter Display';font-weight:700;font-size:72px;color:var(--deep)}
+.timer .n span{position:absolute}
+.why{position:absolute;top:1330px;left:88px;right:88px;font-size:40px;line-height:1.4;color:var(--body);opacity:0}
+.why b{color:var(--ink);font-weight:600}
+.hint{position:absolute;top:1530px;left:88px;right:88px;font-size:32px;color:var(--muted);text-align:center}
+.cta{position:absolute;inset:0;background:var(--deep);color:#fff;opacity:0}
+.cta .ring{position:absolute;right:-260px;top:-60px;width:760px;height:760px;border-radius:50%;border:2px solid rgba(255,255,255,.12)}
+.cta .ring2{position:absolute;right:-140px;top:60px;width:520px;height:520px;border-radius:50%;border:2px solid rgba(255,255,255,.12)}
+.cta .h{position:absolute;top:620px;left:88px;right:88px;font-family:'Inter Display';font-weight:600;font-size:100px;line-height:1.02;letter-spacing:-.031em}
+.cta .b{position:absolute;top:900px;left:88px;right:140px;font-size:40px;line-height:1.45;color:rgba(255,255,255,.78)}
+.cta .btn{position:absolute;top:1090px;left:88px;background:#fff;color:var(--deep);font-family:'Inter Display';font-weight:700;font-size:48px;padding:32px 52px;border-radius:999px}
+.cta .alt{position:absolute;top:1250px;left:96px;font-size:34px;color:rgba(255,255,255,.7)}
+.cta .alt b{color:#fff}
+</style></head>
+<body>
+<div id="stage">
+  <div class="hdr a"><div class="brand"><img src="../assets/logo.svg">Otbozor</div><div class="pill">VIKTORINA</div></div>
+  <div class="q a">{{Q1}}<br><span class="mark">{{QMARK}}</span>{{Q2}}</div>
+  <div class="opts">
+    <div class="opt a" id="optA"><div class="k">A</div><div>{{A}}</div><div class="ok">&#10003;</div></div>
+    <div class="opt a" id="optB"><div class="k">B</div><div>{{B}}</div><div class="ok">&#10003;</div></div>
+  </div>
+  <div class="timer" id="timer">
+    <svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="66" fill="none" stroke="#DCE5DF" stroke-width="10"/>
+      <circle id="arc" cx="75" cy="75" r="66" fill="none" stroke="#15803D" stroke-width="10" stroke-linecap="round" stroke-dasharray="414.7" stroke-dashoffset="0"/></svg>
+    <div class="n"><span id="n3">3</span><span id="n2">2</span><span id="n1">1</span></div>
+  </div>
+  <div class="hint" id="hint">Javobingizni izohda yozing</div>
+  <div class="why" id="why">{{WHY}}</div>
+  <div class="cta" id="cta"><div class="ring"></div><div class="ring2"></div>
+    <div class="h ca">{{CTA_TITLE}}</div>
+    <div class="b ca">{{CTA_BODY}}</div>
+    <div class="btn ca">@otbozor_bot &rarr;</div>
+    <div class="alt ca">yoki saytda: <b>otbozor.uz</b></div>
+  </div>
+</div>
+<script>
+document.fonts.ready.then(() => {
+  const E = 'cubic-bezier(.2,.8,.2,1)';
+  const rise = (el, delay) => el.animate([{opacity: 0, transform: 'translateY(50px)'}, {opacity: 1, transform: 'none'}],
+                                         {delay, duration: 650, easing: E, fill: 'both'});
+  const right = document.getElementById('opt{{RIGHT}}'), wrong = document.getElementById('opt{{WRONG}}');
+  document.querySelectorAll('.a').forEach((el, i) => rise(el, 100 + i * 160));
+  document.querySelector('.mark').animate([{clipPath: 'inset(0 100% 0 0 round .14em)'}, {clipPath: 'inset(0 0 0 0 round .14em)'}],
+    {delay: 650, duration: 600, easing: 'cubic-bezier(.6,0,.2,1)', fill: 'both'});
+  // countdown 3-2-1 (1.6s .. 4.6s)
+  const t0 = 1600;
+  document.getElementById('timer').animate([{opacity: 0, transform: 'scale(.6)'}, {opacity: 1, transform: 'none'}], {delay: t0 - 300, duration: 400, easing: E, fill: 'both'});
+  document.getElementById('arc').animate([{strokeDashoffset: 0}, {strokeDashoffset: 414.7}], {delay: t0, duration: 3000, fill: 'both'});
+  ['n3', 'n2', 'n1'].forEach((id, i) => document.getElementById(id).animate(
+    [{opacity: 0, transform: 'scale(1.4)'}, {opacity: 1, transform: 'scale(1)', offset: .15}, {opacity: 1, offset: .85}, {opacity: 0, transform: 'scale(.8)'}],
+    {delay: t0 + i * 1000, duration: 1000, fill: 'both'}));
+  // reveal (4.6s)
+  const r = t0 + 3000;
+  document.getElementById('timer').animate([{opacity: 1}, {opacity: 0}], {delay: r, duration: 250, fill: 'forwards'});
+  rise(document.getElementById('hint'), t0);
+  document.getElementById('hint').animate([{opacity: 1}, {opacity: 0}], {delay: r, duration: 250, fill: 'forwards'});
+  right.animate([{background: '#fff', borderColor: '#DCE5DF', color: '#0B1F14'}, {background: '#15803D', borderColor: '#15803D', color: '#fff'}], {delay: r, duration: 350, fill: 'both'});
+  right.animate([{transform: 'scale(1)'}, {transform: 'scale(1.04)'}, {transform: 'scale(1)'}], {delay: r, duration: 600, easing: 'ease-out'});
+  right.querySelector('.k').animate([{background: '#F3F7F4', color: '#15803D'}, {background: 'rgba(255,255,255,.18)', color: '#fff'}], {delay: r, duration: 350, fill: 'both'});
+  right.querySelector('.ok').animate([{opacity: 0, transform: 'scale(.3)'}, {opacity: 1, transform: 'none'}], {delay: r + 200, duration: 450, easing: E, fill: 'both'});
+  wrong.animate([{opacity: 1}, {opacity: .35}], {delay: r, duration: 400, fill: 'forwards'});
+  rise(document.getElementById('why'), r + 450);
+  // CTA (8.8s)
+  const c = r + 4200;
+  document.getElementById('cta').animate([{opacity: 0}, {opacity: 1}], {delay: c, duration: 450, fill: 'both'});
+  document.querySelectorAll('.ca').forEach((el, i) => rise(el, c + 200 + i * 140));
+  document.getAnimations().forEach(a => a.pause());
+  window.seek = ms => document.getAnimations().forEach(a => { a.currentTime = ms; });
+  window.REEL_TOTAL = c + 3600;
+  document.body.dataset.reel = '1';
+});
+</script>
+</body></html>
