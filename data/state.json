@@ -2,8 +2,9 @@
   "tg_offset": 904885756,
   "posts": {
     "01": {
-      "status": null,
-      "attempts": 0
+      "status": "regen",
+      "attempts": 0,
+      "feedback": null
     },
     "02": {
       "status": null,
