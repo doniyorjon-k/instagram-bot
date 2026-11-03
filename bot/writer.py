@@ -108,39 +108,52 @@ def full_caption(c: dict) -> str:
 
 # ---------- providers ----------
 
-def _gemini(prompt: str) -> str:
-    """Gemini with Google Search when the key allows it.
+GEMINI_MODELS = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]
 
-    On the free tier, Search grounding is not available for Gemini 3+ models and
-    returns 429/400, so we retry once without the search tool.
+
+def _gemini(prompt: str) -> str:
+    """Gemini, trying several free-tier models.
+
+    Search grounding is not on the free tier for Gemini 3+ models (429/400), so each
+    model is asked once with Search and once without. A busy or rate-limited model
+    (429/5xx) moves on to the next one.
     """
     from google import genai
     from google.genai import errors, types
 
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"],
                           http_options=types.HttpOptions(timeout=240_000))
-    model = os.environ.get("GEMINI_MODEL") or "gemini-3.8-flash"
+    models = [m.strip() for m in (os.environ.get("GEMINI_MODEL") or "").split(",") if m.strip()] or GEMINI_MODELS
     search = os.environ.get("GEMINI_SEARCH", "auto").lower() != "off"
 
-    def ask(with_search: bool) -> str:
+    def ask(model: str, with_search: bool) -> str:
         tools = [types.Tool(google_search=types.GoogleSearch())] if with_search else None
+        thinking = None if "lite" in model else types.ThinkingConfig(
+            thinking_level=os.environ.get("GEMINI_THINKING") or "low")
         resp = client.models.generate_content(
             model=model, contents=prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM, tools=tools,
-                thinking_config=types.ThinkingConfig(thinking_level=os.environ.get("GEMINI_THINKING") or "low"),
-            ),
+            config=types.GenerateContentConfig(system_instruction=SYSTEM, tools=tools,
+                                               thinking_config=thinking),
         )
         return resp.text or ""
 
-    if search:
-        try:
-            return ask(True)
-        except errors.ClientError as e:
-            if e.code not in (400, 403, 429):
-                raise
-            print(f"Gemini search unavailable ({e.code}), retrying without search")
-    return ask(False)
+    last = None
+    for model in models:
+        for with_search in ([True, False] if search else [False]):
+            try:
+                return ask(model, with_search)
+            except errors.ClientError as e:
+                last = e
+                print(f"Gemini {model} search={with_search}: {e.code}", flush=True)
+                if e.code not in (400, 403, 404, 429):
+                    raise
+                if e.code == 404:
+                    break
+            except errors.ServerError as e:
+                last = e
+                print(f"Gemini {model} busy: {e.code}", flush=True)
+                break
+    raise last
 
 
 def _claude(prompt: str) -> str:

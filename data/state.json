@@ -3,7 +3,7 @@
   "posts": {
     "01": {
       "status": "regen",
-      "attempts": 1,
+      "attempts": 0,
       "feedback": null,
       "last_error": "matn/rasm: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
     },
