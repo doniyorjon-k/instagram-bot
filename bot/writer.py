@@ -117,7 +117,8 @@ def _gemini(prompt: str) -> str:
     from google import genai
     from google.genai import errors, types
 
-    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"],
+                          http_options=types.HttpOptions(timeout=240_000))
     model = os.environ.get("GEMINI_MODEL") or "gemini-3.8-flash"
     search = os.environ.get("GEMINI_SEARCH", "auto").lower() != "off"
 
@@ -125,7 +126,10 @@ def _gemini(prompt: str) -> str:
         tools = [types.Tool(google_search=types.GoogleSearch())] if with_search else None
         resp = client.models.generate_content(
             model=model, contents=prompt,
-            config=types.GenerateContentConfig(system_instruction=SYSTEM, tools=tools),
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM, tools=tools,
+                thinking_config=types.ThinkingConfig(thinking_level=os.environ.get("GEMINI_THINKING") or "low"),
+            ),
         )
         return resp.text or ""
 

@@ -3,7 +3,7 @@
   "posts": {
     "01": {
       "status": "regen",
-      "attempts": 1,
+      "attempts": 0,
       "feedback": null,
       "last_error": "matn/rasm: Server disconnected without sending a response."
     },
