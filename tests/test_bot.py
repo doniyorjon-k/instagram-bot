@@ -311,3 +311,86 @@ def test_late_approvals_publish_one_per_day_at_publish_time(tmp_path, content):
     bot.now = datetime(2026, 11, 9, 19, 0, tzinfo=TZ)
     bot.run()
     assert len(FakeIG.published) == 2 and bot.state["posts"]["02"]["status"] == "published"
+
+
+REELS = json.loads((Path(__file__).parent / "fixtures" / "sample_reels.json").read_text())
+
+
+def test_sample_reels_are_valid():
+    for kind, data in REELS.items():
+        data = dict(data, caption="x" * 400, hashtags=["#otbozor"])
+        assert writer.validate_reel(kind, data) == [], kind
+
+
+def test_reel_validation_catches_bad_answer_and_number():
+    q = dict(REELS["quiz"], right="C", caption="x" * 400, hashtags=["#a"])
+    f = dict(REELS["fact"], number="ko'p", caption="x" * 400, hashtags=["#a"])
+    assert any("right" in e for e in writer.validate_reel("quiz", q))
+    assert any("number" in e for e in writer.validate_reel("fact", f))
+
+
+class FakeReelTG(FakeTG):
+    def __init__(self):
+        super().__init__()
+        self.videos = []
+
+    def send_video(self, chat, video, cover=None):
+        self.videos.append(video)
+        return self._msg()
+
+
+class FakeReelIG(FakeIG):
+    reels = []
+
+    def publish_reel(self, url, caption):
+        FakeReelIG.reels.append((url, caption))
+        return {"id": "r1", "permalink": "https://instagram.com/reel/x"}
+
+
+def test_reel_draft_approve_publish(tmp_path, content):
+    plan = dict(PLAN, posts=[{"id": "R01", "type": "reel", "format": "quiz", "date": "2026-11-06",
+                              "topic": "Uyqu", "idea": "i", "cta": "bot"}])
+    reel = dict(REELS["quiz"], caption="x" * 400, hashtags=["#otbozor"])
+    rendered = []
+
+    def render_reel(kind, c, out, cover):
+        rendered.append(kind)
+        out.write_bytes(b"mp4")
+        cover.write_bytes(b"jpg")
+
+    tg = FakeReelTG()
+    bot = Bot(plan, {"tg_offset": None, "posts": {}}, tg, ig_factory=FakeReelIG,
+              write_reel=lambda p, fb=None: reel, render_reel=render_reel,
+              upload=lambda paths, folder: [f"https://cdn/{p.name}" for p in paths],
+              now=datetime(2026, 11, 5, 10, 0, tzinfo=TZ), drafts_dir=tmp_path)
+    bot.run()
+    assert rendered == ["quiz"] and len(tg.videos) == 1
+    assert "Reels (viktorina)" in tg.sent[-1][1]
+    tg._updates = [cb("ok:R01")]
+    bot.now = datetime(2026, 11, 6, 19, 0, tzinfo=TZ)
+    bot.run()
+    assert bot.state["posts"]["R01"]["status"] == "published"
+    assert FakeReelIG.reels[-1][0] == "https://cdn/reel.mp4"
+
+
+def test_qayta_accepts_reel_ids(tmp_path, content):
+    plan = dict(PLAN, posts=PLAN["posts"] + [{"id": "R01", "type": "reel", "format": "myth",
+                                               "date": "2026-11-06", "topic": "t", "idea": "i", "cta": "bot"}])
+    tg = FakeTG([{"update_id": 1, "message": {"chat": {"id": 42}, "text": "/qayta r01"}}])
+    bot = Bot(plan, {"tg_offset": None, "posts": {}}, tg, now=datetime(2026, 11, 1, 10, 0, tzinfo=TZ),
+              drafts_dir=tmp_path, write_reel=lambda p, fb=None: (_ for _ in ()).throw(RuntimeError("x")))
+    bot.handle_updates()
+    assert bot.state["posts"]["R01"]["status"] == "regen"
+
+
+def test_videos_use_jsdelivr():
+    assert storage.public_url("o/r", "abc", "drafts/R01/reel.mp4") == "https://cdn.jsdelivr.net/gh/o/r@abc/drafts/R01/reel.mp4"
+    assert storage.public_url("o/r", "abc", "drafts/01/01.jpg").startswith("https://raw.githubusercontent.com/")
+
+
+def test_instagram_reel_flow():
+    http = FakeHTTP([{"id": "c1"}, {"status_code": "IN_PROGRESS"}, {"status_code": "FINISHED"},
+                     {"id": "m1"}, {"permalink": "https://instagram.com/reel/a"}])
+    ig = Instagram(token="t", user_id="u1", session=http, sleep=lambda s: None)
+    assert ig.publish_reel("https://v/reel.mp4", "cap")["permalink"].endswith("/a")
+    assert http.calls[0][2]["media_type"] == "REELS" and http.calls[0][2]["video_url"] == "https://v/reel.mp4"

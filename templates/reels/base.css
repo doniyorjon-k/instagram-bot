@@ -1,0 +1,29 @@
+@font-face{font-family:'Inter';src:url('../../assets/fonts/Inter-Regular.otf');font-weight:400}
+@font-face{font-family:'Inter';src:url('../../assets/fonts/Inter-Medium.otf');font-weight:500}
+@font-face{font-family:'Inter';src:url('../../assets/fonts/Inter-SemiBold.otf');font-weight:600}
+@font-face{font-family:'Inter Display';src:url('../../assets/fonts/InterDisplay-Light.otf');font-weight:300}
+@font-face{font-family:'Inter Display';src:url('../../assets/fonts/InterDisplay-SemiBold.otf');font-weight:600}
+@font-face{font-family:'Inter Display';src:url('../../assets/fonts/InterDisplay-Bold.otf');font-weight:700}
+:root{--ink:#0B1F14;--body:#4A5550;--muted:#9AA39D;--green:#15803D;--deep:#0F5F33;--mist:#F3F7F4;--line:#DCE5DF;--red:#B42318;--rose:#FDECEA}
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;overflow:hidden;font-family:'Inter';color:var(--ink);background:var(--mist)}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--mist)}
+/* Instagram covers ~250px at the top and ~400px at the bottom with its own UI. */
+.hdr{position:absolute;top:250px;left:88px;right:88px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+.brand{display:flex;align-items:center;gap:14px;font-family:'Inter Display';font-weight:700;font-size:34px}
+.brand img{width:72px}
+.pill{background:var(--deep);color:#fff;font-weight:600;font-size:28px;letter-spacing:2px;padding:12px 26px;border-radius:999px}
+.big{font-family:'Inter Display';font-weight:600;letter-spacing:-.034em;line-height:1.02}
+.mark{display:inline-block;background:var(--deep);color:#fff;padding:0 .17em .05em;border-radius:.14em}
+.txt{font-size:40px;line-height:1.42;color:var(--body)}
+.txt b{color:var(--ink);font-weight:600}
+.fit{overflow:hidden}
+.scene{position:absolute;inset:0;opacity:0}
+.cta{position:absolute;inset:0;background:var(--deep);color:#fff;opacity:0;z-index:10}
+.cta .ring{position:absolute;right:-260px;top:-60px;width:760px;height:760px;border-radius:50%;border:2px solid rgba(255,255,255,.12)}
+.cta .ring2{position:absolute;right:-140px;top:60px;width:520px;height:520px;border-radius:50%;border:2px solid rgba(255,255,255,.12)}
+.cta .h{position:absolute;top:560px;left:88px;right:88px;height:320px;font-size:100px;display:flex;align-items:flex-end}
+.cta .b{position:absolute;top:910px;left:88px;right:140px;height:180px;font-size:40px;line-height:1.45;color:rgba(255,255,255,.78)}
+.cta .btn{position:absolute;top:1110px;left:88px;background:#fff;color:var(--deep);font-family:'Inter Display';font-weight:700;font-size:48px;padding:32px 52px;border-radius:999px}
+.cta .alt{position:absolute;top:1270px;left:96px;font-size:34px;color:rgba(255,255,255,.7)}
+.cta .alt b{color:#fff}

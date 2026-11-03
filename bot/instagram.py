@@ -50,14 +50,14 @@ class Instagram:
         self.user_id = str(match["id"])
         return self.user_id
 
-    def _wait_ready(self, container_id: str, tries: int = 20):
+    def _wait_ready(self, container_id: str, tries: int = 20, every: int = 5):
         for _ in range(tries):
             status = self._req("GET", container_id, fields="status_code").get("status_code")
             if status == "FINISHED":
                 return
             if status in ("ERROR", "EXPIRED"):
                 raise RuntimeError(f"Instagram konteyner holati: {status}")
-            self.sleep(5)
+            self.sleep(every)
         raise RuntimeError("Instagram konteyneri tayyor bo'lmadi")
 
     def publish_carousel(self, image_urls: list[str], caption: str) -> dict:
@@ -73,6 +73,18 @@ class Instagram:
         self._wait_ready(parent["id"])
         media = self._req("POST", f"{uid}/media_publish", creation_id=parent["id"])
         # The post is live now; a failed permalink lookup must not trigger a re-publish.
+        try:
+            link = self._req("GET", media["id"], fields="permalink").get("permalink")
+        except Exception:
+            link = None
+        return {"id": media["id"], "permalink": link}
+
+    def publish_reel(self, video_url: str, caption: str, thumb_offset_ms: int = 1600) -> dict:
+        uid = self.me()
+        c = self._req("POST", f"{uid}/media", media_type="REELS", video_url=video_url, caption=caption,
+                      share_to_feed="true", thumb_offset=str(thumb_offset_ms))
+        self._wait_ready(c["id"], tries=60, every=10)  # video processing takes a while
+        media = self._req("POST", f"{uid}/media_publish", creation_id=c["id"])
         try:
             link = self._req("GET", media["id"], fields="permalink").get("permalink")
         except Exception:

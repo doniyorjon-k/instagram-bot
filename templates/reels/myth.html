@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="uz"><head><meta charset="utf-8"><link rel="stylesheet" href="base.css">
+<style>
+.tag{position:absolute;left:88px;display:inline-flex;align-items:center;gap:16px;font-weight:600;font-size:34px;letter-spacing:3px;padding:16px 30px;border-radius:999px}
+.tag i{font-style:normal;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;color:#fff}
+.t-myth{top:420px;background:var(--rose);color:var(--red)} .t-myth i{background:var(--red)}
+.t-fact{top:420px;background:#E3F1E8;color:var(--green)} .t-fact i{background:var(--green)}
+.claim{position:absolute;top:540px;left:88px;right:88px;height:560px;font-size:92px}
+.claim span{position:relative}
+.strike{position:absolute;left:0;top:52%;height:12px;background:var(--red);border-radius:6px;width:100%}
+.col{position:absolute;top:540px;left:88px;right:88px;display:flex;flex-direction:column;gap:44px}
+.fact{font-size:92px}
+.why{max-width:860px}
+.s2{background:#fff}
+.line{width:96px;height:4px;background:var(--green)}
+</style></head>
+<body><div id="stage"></div>
+<script>window.DATA = __DATA__;</script>
+<script>
+window.build = (D, R, stage, fit) => {
+  const {$, rise} = R;
+  const s1 = $('div', 'scene', null, stage); s1.style.opacity = 1;
+  const s2 = $('div', 'scene s2', null, stage);
+  const hdr = R.header(stage, 'AFSONA VA HAQIQAT');
+  const t1 = $('div', 'tag t-myth', null, s1); $('i', null, '✕', t1); t1.append('AFSONA');
+  const claim = $('div', 'claim big fit', null, s1); claim.dataset.min = 64;
+  const cs = $('span', null, '“' + D.myth + '”', claim);
+  const t2 = $('div', 'tag t-fact', null, s2); $('i', null, '✓', t2); t2.append('HAQIQAT');
+  const col = $('div', 'col', null, s2);
+  const fact = $('div', 'fact big', D.fact, col);
+  const line = $('div', 'line', null, col);
+  const why = $('div', 'why txt', D.why, col);
+  fit();
+  // strike-through lines, one per rendered text line
+  const rects = [...cs.getClientRects()], base = claim.getBoundingClientRect();
+  const strikes = rects.map(r => { const s = $('div', 'strike', null, s1);
+    Object.assign(s.style, {left: (r.left) + 'px', top: (r.top + r.height * .55) + 'px', width: r.width + 'px', position: 'absolute'}); return s; });
+  rise(hdr, 100); rise(t1, 300); rise(claim, 450);
+  const st = 2600;
+  strikes.forEach((s, i) => s.animate([{transform: 'scaleX(0)', transformOrigin: 'left'}, {transform: 'scaleX(1)', transformOrigin: 'left'}],
+    {delay: st + i * 250, duration: 420, easing: 'cubic-bezier(.6,0,.2,1)', fill: 'both'}));
+  claim.animate([{color: '#0B1F14'}, {color: '#9AA39D'}], {delay: st, duration: 500, fill: 'forwards'});
+  const s2t = st + 1400;
+  R.fadeIn(s2, s2t, 400);
+  rise(t2, s2t + 200); rise(fact, s2t + 350);
+  line.animate([{transform: 'scaleX(0)', transformOrigin: 'left'}, {transform: 'scaleX(1)', transformOrigin: 'left'}], {delay: s2t + 700, duration: 500, fill: 'both'});
+  rise(why, s2t + 850);
+  return R.cta(stage, D, s2t + 5200);
+};
+</script>
+<script src="base.js"></script>
+</body></html>

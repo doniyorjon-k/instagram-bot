@@ -20,6 +20,7 @@ Qoidalar:
   Shubhali yoki tekshirib bo'lmaydigan raqam yozma.
 - Sog'liq bo'yicha maslahatda jiddiy holatlarda veterinarga murojaat qilishni eslat.
 - Emoji ishlatma (caption ichida ham).
+- Imlo va grammatikaga qat'iy rioya qil: so'zlarni chala yoki takror yozma, javobni yuborishdan oldin har bir gapni qayta o'qib tekshir.
 - Asosiy CTA - Telegram bot @otbozor_bot, ikkinchi o'rinda sayt otbozor.uz. CTA matnini caption'ga o'zing qo'shma, uni dastur qo'shadi.
 """
 
@@ -212,3 +213,123 @@ def write_post(post: dict, feedback: str | None = None, call=None) -> dict:
             "\n\nOldingi javobingda xatolar bor edi, tuzatib qayta yoz:\n- " + "\n- ".join(last_errs)
         )
     raise RuntimeError("Matn talablarga mos kelmadi: " + "; ".join(last_errs))
+
+
+# ---------- Reels ----------
+
+REEL_FORMATS = {
+    "quiz": """{
+  "q1": "savolning boshi, <=24 belgi", "qmark": "yashil fonda ajratiladigan 1-2 so'z, <=14 belgi",
+  "q2": "savol oxiri (bo'sh bo'lishi mumkin), <=16 belgi",
+  "a": "A javob, <=18 belgi", "b": "B javob, <=18 belgi", "right": "A yoki B",
+  "answer": "to'g'ri javob qisqa, <=30 belgi", "why": "izoh, 1-2 gap, <=170 belgi",
+  "cta_title": "<=40 belgi", "cta_body": "<=90 belgi",
+  "caption": "...", "hashtags": [...], "sources": [...]
+}
+Savol oddiy odam qiziqadigan, aniq bir to'g'ri javobi bor bo'lsin. Noto'g'ri javob ham ishonarli ko'rinsin.""",
+    "myth": """{
+  "myth": "keng tarqalgan noto'g'ri fikr, <=60 belgi, qo'shtirnoqsiz",
+  "fact": "haqiqat, qisqa va kuchli, <=60 belgi", "why": "tushuntirish, 1-2 gap, <=180 belgi",
+  "cta_title": "<=40 belgi", "cta_body": "<=90 belgi",
+  "caption": "...", "hashtags": [...], "sources": [...]
+}""",
+    "fact": """{
+  "lead": "Bilasizmi?", "number": "faqat raqam, masalan 205 yoki 1.5", "prefix": "raqam oldidan belgi yoki bo'sh",
+  "suffix": "raqam ortidan qisqa belgi (masalan %) yoki bo'sh",
+  "unit": "raqamdan keyingi davom, <=50 belgi (masalan: ta suyak bor otning skeletida)",
+  "why": "qo'shimcha izoh, 1-2 gap, <=170 belgi",
+  "cta_title": "<=40 belgi", "cta_body": "<=90 belgi",
+  "caption": "...", "hashtags": [...], "sources": [...]
+}
+Raqam aniq va tekshirilgan bo'lsin. Ishonching komil bo'lmasa, boshqa faktni tanla.""",
+    "mistakes": """{
+  "title1": "sarlavha boshi, <=22 belgi", "titlemark": "ajratiladigan qism, masalan: 3 ta xato, <=14 belgi",
+  "title2": "sarlavha oxiri yoki bo'sh, <=16 belgi",
+  "items": [{"bad": "xato, <=60 belgi", "good": "to'g'risi, <=60 belgi"}, ... aniq 3 ta],
+  "cta_title": "<=40 belgi", "cta_body": "<=90 belgi",
+  "caption": "...", "hashtags": [...], "sources": [...]
+}""",
+}
+
+REEL_LIMITS = {
+    "quiz": {"q1": 24, "qmark": 14, "q2": 16, "a": 18, "b": 18, "answer": 30, "why": 170},
+    "myth": {"myth": 60, "fact": 60, "why": 180},
+    "fact": {"unit": 50, "why": 170, "prefix": 4, "suffix": 4, "lead": 20},
+    "mistakes": {"title1": 22, "titlemark": 14, "title2": 16},
+}
+OPTIONAL = {"q2", "title2", "prefix", "suffix", "lead"}
+
+
+def build_reel_prompt(item: dict, feedback: str | None = None) -> str:
+    kind = item["format"]
+    lines = [
+        f"Instagram Reels (10-18 soniyalik animatsion video) uchun matn yoz. Format: {kind}.",
+        f"Mavzu: {item['topic']}",
+        f"G'oya: {item.get('idea', '')}",
+        "",
+        "Javobni FAQAT bitta ```json ... ``` blokida, quyidagi tuzilishda ber:",
+        REEL_FORMATS[kind],
+        "caption: Instagram matni, 300-800 belgi, video mazmunini kengaytiradi. Hashtag va CTA qo'shma."
+        + (" Oxirida izohda javob yozishga chaqir." if kind == "quiz" else ""),
+        "hashtags: 8-12 ta, #otbozor bilan. sources: foydalangan manbalaring.",
+    ]
+    if feedback:
+        lines += ["", "Oldingi variantga egasining izohi (albatta hisobga ol):", feedback]
+    return "\n".join(lines)
+
+
+def validate_reel(kind: str, c: dict) -> list[str]:
+    errs: list[str] = []
+    try:
+        for key, limit in {**REEL_LIMITS[kind], "cta_title": 40, "cta_body": 90}.items():
+            val = c.get(key, "")
+            if not isinstance(val, str):
+                errs.append(f"{key} matn bo'lishi kerak")
+            elif not val.strip() and key not in OPTIONAL:
+                errs.append(f"{key} bo'sh")
+            elif len(val) > limit:
+                errs.append(f"{key} {len(val)} belgi, ko'pi bilan {limit}")
+        if kind == "quiz" and str(c.get("right", "")).upper() not in ("A", "B"):
+            errs.append("right A yoki B bo'lishi kerak")
+        if kind == "fact":
+            try:
+                float(str(c["number"]))
+            except (KeyError, ValueError):
+                errs.append("number faqat raqam bo'lishi kerak")
+        if kind == "mistakes":
+            items = c.get("items")
+            if not isinstance(items, list) or len(items) != 3:
+                errs.append("items aniq 3 ta bo'lishi kerak")
+            else:
+                for i, it in enumerate(items, 1):
+                    for k in ("bad", "good"):
+                        v = it.get(k, "")
+                        if not v or len(v) > 60:
+                            errs.append(f"items[{i}].{k} bo'sh yoki 60 belgidan uzun")
+        if not 200 <= len(c.get("caption", "")) <= 1600:
+            errs.append(f"caption {len(c.get('caption', ''))} belgi, 300-800 atrofida bo'lishi kerak")
+        if not isinstance(c.get("hashtags"), list) or not c["hashtags"]:
+            errs.append("hashtags yo'q")
+    except (KeyError, TypeError, AttributeError) as e:
+        errs.append(f"tuzilish noto'g'ri: {e}")
+    return errs
+
+
+def write_reel(item: dict, feedback: str | None = None, call=None) -> dict:
+    call = call or (_gemini if provider() == "gemini" else _claude)
+    kind = item["format"]
+    prompt = build_reel_prompt(item, feedback)
+    last_errs: list[str] = []
+    for _ in range(3):
+        text = call(prompt)
+        try:
+            content = extract_json(text)
+        except (ValueError, json.JSONDecodeError):
+            last_errs = ["JSON topilmadi yoki buzilgan"]
+        else:
+            last_errs = validate_reel(kind, content)
+            if not last_errs:
+                return content
+        prompt = build_reel_prompt(item, feedback) + (
+            "\n\nOldingi javobingda xatolar bor edi, tuzatib qayta yoz:\n- " + "\n- ".join(last_errs))
+    raise RuntimeError("Reels matni talablarga mos kelmadi: " + "; ".join(last_errs))

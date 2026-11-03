@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def upload(paths: list[Path], folder: str, session=None) -> list[str]:
-    if os.environ.get("CLOUDINARY_URL"):
+    if os.environ.get("CLOUDINARY_URL") and not any(p.suffix == ".mp4" for p in paths):
         return cloudinary_upload(paths, folder, session)
     return github_urls(paths, session)
 
@@ -43,13 +43,20 @@ def _ensure_committed(paths: list[Path], git=_git) -> str:
     return git("rev-parse", "HEAD")
 
 
+def public_url(repo: str, sha: str, rel: str) -> str:
+    # raw.githubusercontent.com serves videos as application/octet-stream, which
+    # Instagram may refuse; jsDelivr serves the same commit with video/mp4.
+    if rel.endswith(".mp4"):
+        return f"https://cdn.jsdelivr.net/gh/{repo}@{sha}/{rel}"
+    return f"https://raw.githubusercontent.com/{repo}/{sha}/{rel}"
+
+
 def github_urls(paths: list[Path], session=None, git=_git, sleep=time.sleep) -> list[str]:
     repo = os.environ.get("GITHUB_REPOSITORY")
     if not repo:
         raise RuntimeError("GITHUB_REPOSITORY yo'q: rasm URL'ini yasab bo'lmadi (CLOUDINARY_URL ham yo'q).")
     sha = _ensure_committed(paths, git)
-    urls = [f"https://raw.githubusercontent.com/{repo}/{sha}/{p.resolve().relative_to(ROOT).as_posix()}"
-            for p in paths]
+    urls = [public_url(repo, sha, p.resolve().relative_to(ROOT).as_posix()) for p in paths]
     http = session or requests.Session()
     for url in urls:
         for attempt in range(5):

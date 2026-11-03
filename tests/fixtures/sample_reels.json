@@ -1,0 +1,50 @@
+{
+  "quiz": {
+    "q1": "Ot bir kunda",
+    "qmark": "necha soat",
+    "q2": "uxlaydi?",
+    "a": "8–9 soat",
+    "b": "2–3 soat",
+    "right": "B",
+    "answer": "Atigi 2–3 soat.",
+    "why": "Ot ko'pincha tik turib mudraydi, chuqur uyqu uchun esa yotishi kerak. Shuning uchun otxonada quruq va xavfsiz joy muhim.",
+    "cta_title": "Har kuni otlar haqida foydali bilim",
+    "cta_body": "E'lonlar, narxlar va maslahatlar Telegram botimizda."
+  },
+  "myth": {
+    "myth": "Ot faqat tik turib uxlaydi",
+    "fact": "Chuqur uyqu uchun ot albatta yotadi",
+    "why": "Tik turib ot faqat mudraydi. Chuqur uyqu bosqichi uchun u yotishi kerak, aks holda charchoq to'planadi.",
+    "cta_title": "Afsonalarga emas, bilimga tayaning",
+    "cta_body": "Otlar haqida tekshirilgan maslahatlar Telegram botimizda."
+  },
+  "fact": {
+    "lead": "Bilasizmi?",
+    "number": "205",
+    "unit": "ta suyak bor otning skeletida",
+    "why": "Odamda esa 206 ta suyak bor, ya'ni ot bilan deyarli teng. Kuchli suyaklar uchun ot ratsionida kalsiy va fosfor yetarli bo'lishi kerak.",
+    "cta_title": "Har kuni bitta qiziq fakt",
+    "cta_body": "Otlar haqida foydali ma'lumotlar Telegram botimizda."
+  },
+  "mistakes": {
+    "title1": "Ot sotib olishda",
+    "titlemark": "3 ta xato",
+    "title2": "",
+    "items": [
+      {
+        "bad": "Otni faqat rasmga qarab tanlash",
+        "good": "Otni jonli ko'rib, yurishini kuzating"
+      },
+      {
+        "bad": "Veterinar ko'rigisiz sotib olish",
+        "good": "Sotib olishdan oldin veterinarga ko'rsating"
+      },
+      {
+        "bad": "Hujjat va kelib chiqishini so'ramaslik",
+        "good": "Pasport va nasl hujjatlarini tekshiring"
+      }
+    ],
+    "cta_title": "Ishonchli otni bir joydan toping",
+    "cta_body": "Tekshirilgan e'lonlar Telegram botimizda."
+  }
+}

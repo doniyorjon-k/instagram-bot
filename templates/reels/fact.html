@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="uz"><head><meta charset="utf-8"><link rel="stylesheet" href="base.css">
+<style>
+.lead{position:absolute;top:420px;left:88px;right:88px;font-size:84px;color:var(--green)}
+.num{position:absolute;top:560px;left:88px;right:88px;font-family:'Inter Display';font-weight:700;font-size:330px;line-height:1;letter-spacing:-.05em;color:var(--deep);font-variant-numeric:tabular-nums}
+.unit{position:absolute;top:900px;left:88px;right:88px;height:220px;font-size:84px}
+.why{position:absolute;top:1170px;left:88px;right:88px;height:260px}
+.bar{position:absolute;top:1130px;left:88px;width:96px;height:4px;background:var(--green)}
+</style></head>
+<body><div id="stage"></div>
+<script>window.DATA = __DATA__;</script>
+<script>
+window.build = (D, R, stage, fit) => {
+  const {$, rise} = R;
+  const hdr = R.header(stage, 'BILASIZMI?');
+  const lead = $('div', 'lead big', D.lead || 'Bilasizmi?', stage);
+  const num = $('div', 'num', null, stage);
+  const unit = $('div', 'unit big fit', null, stage); unit.dataset.min = 56; $('span', null, D.unit, unit);
+  const bar = $('div', 'bar', null, stage);
+  const why = $('div', 'why txt fit', D.why, stage);
+  fit();
+  const target = Number(D.number), prefix = D.prefix || '', suffix = D.suffix || '';
+  const dec = String(D.number).includes('.') ? String(D.number).split('.')[1].length : 0;
+  const fmt = v => prefix + v.toLocaleString('ru-RU', {minimumFractionDigits: dec, maximumFractionDigits: dec}).replace(/,/g, '.') + suffix;
+  // Count-up driven by an animation's currentTime so it stays seekable.
+  const t0 = 900, dur = 1600;
+  num.animate([{opacity: 0}, {opacity: 1}], {delay: t0 - 200, duration: 200, fill: 'both'});
+  const set = ms => { const p = Math.min(1, Math.max(0, (ms - t0) / dur)); const e = 1 - Math.pow(1 - p, 3); num.textContent = fmt(target * e); };
+  window.onSeek = set;
+  set(0);
+  rise(hdr, 100); rise(lead, 250);
+  num.animate([{transform: 'scale(.9)'}, {transform: 'none'}], {delay: t0, duration: dur, easing: R.E, fill: 'both'});
+  rise(unit, t0 + dur - 200);
+  bar.animate([{transform: 'scaleX(0)', transformOrigin: 'left'}, {transform: 'scaleX(1)', transformOrigin: 'left'}], {delay: t0 + dur + 200, duration: 500, fill: 'both'});
+  rise(why, t0 + dur + 400);
+  return R.cta(stage, D, t0 + dur + 5200);
+};
+</script>
+<script src="base.js"></script>
+</body></html>

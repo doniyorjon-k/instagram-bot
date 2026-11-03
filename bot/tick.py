@@ -17,6 +17,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+from . import reel as reel_mod
 from . import render as render_mod
 from . import storage, writer
 from .instagram import Instagram
@@ -33,6 +34,7 @@ STATUS_UZ = {
     "approved": "tasdiqlangan", "published": "joylandi", "rejected": "rad etilgan", "error": "xato",
     "skipped": "o'tkazib yuborildi",
 }
+FORMAT_UZ = {"quiz": "viktorina", "myth": "afsona va haqiqat", "fact": "bilasizmi", "mistakes": "3 ta xato"}
 
 
 def load(path: Path) -> dict:
@@ -46,10 +48,13 @@ def save(path: Path, data: dict):
 class Bot:
     def __init__(self, plan: dict, state: dict, tg: Telegram, ig_factory=None,
                  write=writer.write_post, render=render_mod.render, upload=storage.upload,
-                 now: datetime | None = None, drafts_dir: Path = DRAFTS):
+                 now: datetime | None = None, drafts_dir: Path = DRAFTS,
+                 write_reel=writer.write_reel, render_reel=None):
         self.plan, self.state, self.tg = plan, state, tg
         self.ig_factory = ig_factory or Instagram
         self.write, self.render, self.upload = write, render, upload
+        self.write_reel = write_reel
+        self.render_reel = render_reel or (lambda kind, c, out, cover: reel_mod.render(kind, c, out, cover=cover))
         self.tz = ZoneInfo(plan.get("timezone", "Asia/Tashkent"))
         self.now = now or datetime.now(self.tz)
         self.drafts = drafts_dir
@@ -111,13 +116,14 @@ class Bot:
             self.tg.send(chat, self.status_text())
             return
         if text.startswith("/qayta"):
-            pid = text.split()[-1].zfill(2) if len(text.split()) > 1 else ""
+            arg = text.split()[-1].upper() if len(text.split()) > 1 else ""
+            pid = arg.zfill(2) if arg.isdigit() else arg
             if self.post(pid):
                 s = self.st(pid)
                 s.update(status="regen", attempts=0, feedback=None)
                 self.tg.send(chat, f"#{pid} post qayta tayyorlanadi.")
             else:
-                self.tg.send(chat, "Foydalanish: /qayta 03")
+                self.tg.send(chat, "Foydalanish: /qayta 03 yoki /qayta R01")
             return
         reply = msg.get("reply_to_message", {}).get("message_id")
         pid = self.find_by_message(reply) if reply else None
@@ -164,7 +170,7 @@ class Bot:
             self.tg.send(chat, f"#{pid} rad etildi va joylanmaydi. Qaytarish uchun: /qayta {pid}")
 
     def status_text(self) -> str:
-        lines = ["Post rejasi:"]
+        lines = ["Kontent rejasi (R - Reels):"]
         for p in self.plan["posts"]:
             s = self.state["posts"].get(p["id"], {})
             lines.append(f"#{p['id']} {p['date'][5:]} {p['topic']}: {STATUS_UZ.get(s.get('status'), s.get('status'))}")
@@ -188,19 +194,29 @@ class Bot:
 
     def draft(self, p: dict, feedback: str | None):
         pid = p["id"]
-        content = self.write(p, feedback)
+        is_reel = p.get("type") == "reel"
+        content = (self.write_reel if is_reel else self.write)(p, feedback)
         out = self.drafts / pid
-        for old in out.glob("*.jpg") if out.exists() else []:
+        for old in [*out.glob("*.jpg"), *out.glob("*.mp4")] if out.exists() else []:
             old.unlink()
-        images = self.render(content, out)
+        if is_reel:
+            out.mkdir(parents=True, exist_ok=True)
+            video, cover = out / "reel.mp4", out / "cover.jpg"
+            self.render_reel(p["format"], content, video, cover)
+        else:
+            images = self.render(content, out)
         caption = writer.full_caption(content)
         save(out / "content.json", {**content, "full_caption": caption})
         if not self.admin:
             raise RuntimeError("TELEGRAM_ADMIN_ID sozlanmagan")
-        album = self.tg.send_album(self.admin, images)
+        if is_reel:
+            media = [self.tg.send_video(self.admin, video, cover)]
+        else:
+            media = self.tg.send_album(self.admin, images)
         sources = "\n".join(content.get("sources", [])[:5])
         when = max(self.publish_at(p), self.now)
-        text = (f"#{pid} | {p['date']} | {p['topic']}\n"
+        kind = f"Reels ({FORMAT_UZ.get(p.get('format'), p.get('format'))})" if is_reel else "Post"
+        text = (f"#{pid} | {kind} | {p['date']} | {p['topic']}\n"
                 f"Joylanish vaqti: {when:%d.%m %H:%M}\n\n{caption}"
                 + (f"\n\nManbalar:\n{sources}" if sources else "")
                 + "\n\nO'zgartirish kerak bo'lsa, shu xabarga javob (reply) qilib izoh yozing.")
@@ -212,7 +228,7 @@ class Bot:
         s = self.st(pid)
         s.update(status="draft_sent", attempts=0, feedback=None, last_error=None,
                  drafted_at=self.now.isoformat(),
-                 tg_messages=[m["message_id"] for m in album] + [msg["message_id"]])
+                 tg_messages=[m["message_id"] for m in media] + [msg["message_id"]])
 
     # ---------- publishing ----------
     def published_today(self) -> bool:
@@ -240,9 +256,13 @@ class Bot:
         pid = p["id"]
         out = self.drafts / pid
         content = load(out / "content.json")
-        images = sorted(out.glob("*.jpg"))
-        urls = self.upload(images, folder=f"otbozor/{pid}-{self.now:%Y%m%d%H%M}")
-        result = self.ig_factory().publish_carousel(urls, content["full_caption"])
+        if p.get("type") == "reel":
+            (url,) = self.upload([out / "reel.mp4"], folder=f"otbozor/{pid}-{self.now:%Y%m%d%H%M}")
+            result = self.ig_factory().publish_reel(url, content["full_caption"])
+        else:
+            images = sorted(out.glob("*.jpg"))
+            urls = self.upload(images, folder=f"otbozor/{pid}-{self.now:%Y%m%d%H%M}")
+            result = self.ig_factory().publish_carousel(urls, content["full_caption"])
         s = self.st(pid)
         s.update(status="published", attempts=0, published_at=self.now.isoformat(),
                  ig_media_id=result["id"], permalink=result.get("permalink"))

@@ -16,7 +16,13 @@ Instagram'ga joylaydi.
 4. Izoh bilan o'zgartirish uchun post xabariga **reply** qilib yozing, masalan
    "qisqaroq qil, narxlar haqida ham yoz". Bot izohni hisobga olib qayta yozadi.
 
-Telegram buyruqlari: `/holat` (reja holati), `/qayta 03` (3-postni qaytadan tayyorlash).
+Telegram buyruqlari: `/holat` (reja holati), `/qayta 03` (3-postni qaytadan tayyorlash), `/qayta R01` (1-Reelsni).
+
+### Reels
+Postlar orasidagi kunlarda bot 10-18 soniyalik animatsion Reels yasaydi. 4 format navbat bilan almashadi:
+viktorina (A yoki B), afsona va haqiqat, bilasizmi (raqamli fakt), 3 ta xato. Reels ham xuddi post kabi
+Telegram'ga video bo'lib keladi va faqat tasdiqlangandan keyin joylanadi. Rejada ular `R01`, `R02`, ... deb belgilangan.
+Bot kuniga bittadan ortiq narsa joylamaydi: kech tasdiqlangan post yoki Reels keyingi bo'sh kunning 19:00 iga o'tadi.
 
 Hammasi GitHub Actions'da har 30 daqiqada (08:00 dan 23:30 gacha, Toshkent vaqti) ishlaydi.
 Holat `data/state.json`, tayyor slaydlar `drafts/` papkasida saqlanadi.

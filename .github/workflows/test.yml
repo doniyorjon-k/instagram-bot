@@ -15,12 +15,18 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
+      - run: which ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
       - run: pytest -q
       - name: Render sample slides
         env:
           PW_CHANNEL: chrome
         run: |
           python -c "import json; from pathlib import Path; from bot.render import render; print(render(json.load(open('tests/fixtures/sample_content.json')), Path('preview')))"
+      - name: Render sample Reels
+        env:
+          PW_CHANNEL: chrome
+        run: |
+          python -c "import json; from pathlib import Path; from bot import reel; d=json.load(open('tests/fixtures/sample_reels.json')); [reel.render(k, d[k], Path(f'preview/reel-{k}.mp4')) for k in reel.FORMATS]"
       - uses: actions/upload-artifact@v4
         with:
           name: preview-slides

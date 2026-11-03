@@ -49,6 +49,14 @@ class Telegram:
             files[key] = (path.name, path.read_bytes(), "image/jpeg")
         return self.call("sendMediaGroup", files=files, chat_id=chat_id, media=media)
 
+    def send_video(self, chat_id, video: Path, cover: Path | None = None) -> dict:
+        files = {"video": (video.name, video.read_bytes(), "video/mp4")}
+        params = {"chat_id": chat_id, "supports_streaming": "true", "width": 1080, "height": 1920}
+        if cover:
+            files["cover"] = (cover.name, cover.read_bytes(), "image/jpeg")
+            params["cover"] = "attach://cover"
+        return self.call("sendVideo", files=files, **params)
+
     def answer(self, callback_id: str, text: str):
         return self.call("answerCallbackQuery", callback_query_id=callback_id, text=text)
 

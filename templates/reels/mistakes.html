@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="uz"><head><meta charset="utf-8"><link rel="stylesheet" href="base.css">
+<style>
+.ttl{position:absolute;top:500px;left:88px;right:88px;height:640px;font-size:118px}
+.count{position:absolute;top:1200px;left:88px;display:flex;gap:18px}
+.count i{width:120px;height:120px;border-radius:30px;background:#fff;border:3px solid var(--line);display:flex;align-items:center;justify-content:center;font-style:normal;font-family:'Inter Display';font-weight:700;font-size:56px;color:var(--red)}
+.item{background:#fff}
+.item .n{position:absolute;top:400px;left:88px;font-family:'Inter Display';font-weight:300;font-size:200px;line-height:1;color:var(--green);letter-spacing:-6px}
+.row{position:absolute;left:88px;right:88px;display:flex;gap:30px;align-items:flex-start}
+.row i{flex:none;width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;color:#fff;font-size:40px;margin-top:8px}
+.bad{top:680px} .bad i{background:var(--red)} .bad .t{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(180,35,24,.6);text-decoration-thickness:5px}
+.good{top:1000px} .good i{background:var(--green)}
+.row .t{font-family:'Inter Display';font-weight:600;font-size:66px;line-height:1.08;letter-spacing:-.025em;height:270px;flex:1}
+.lbl{display:block;font-family:'Inter';font-weight:600;font-size:28px;letter-spacing:3px;margin-bottom:10px;text-decoration:none}
+.bad .lbl{color:var(--red)} .good .lbl{color:var(--green)}
+</style></head>
+<body><div id="stage"></div>
+<script>window.DATA = __DATA__;</script>
+<script>
+window.build = (D, R, stage, fit) => {
+  const {$, rise} = R;
+  const intro = $('div', 'scene', null, stage); intro.style.opacity = 1;
+  const [ttl, mark] = R.title(intro, 'ttl big fit', D.title1, D.titlemark, D.title2); ttl.dataset.min = 80;
+  const count = $('div', 'count', null, intro);
+  const boxes = [1, 2, 3].map(() => $('i', null, '✕', count));
+  const scenes = D.items.slice(0, 3).map((it, k) => {
+    const s = $('div', 'scene item', null, stage);
+    $('div', 'n', String(k + 1).padStart(2, '0'), s);
+    const bad = $('div', 'row bad', null, s); $('i', null, '✕', bad);
+    const bt = $('div', 't fit', null, bad); bt.dataset.min = 40; $('span', 'lbl', 'XATO', bt); bt.append(it.bad);
+    const good = $('div', 'row good', null, s); $('i', null, '✓', good);
+    const gt = $('div', 't fit', null, good); gt.dataset.min = 40; $('span', 'lbl', "TO'G'RISI", gt); gt.append(it.good);
+    return [s, bad, good];
+  });
+  const hdr = R.header(stage, "3 TA XATO");
+  fit();
+  rise(hdr, 100); rise(ttl, 250); if (mark) R.wipe(mark, 800);
+  boxes.forEach((b, i) => R.pop(b, 1200 + i * 180));
+  let t = 3000;
+  scenes.forEach(([s, bad, good]) => {
+    R.fadeIn(s, t, 350);
+    rise(s.querySelector('.n'), t + 150);
+    rise(bad, t + 350);
+    rise(good, t + 1500);
+    t += 3800;
+  });
+  return R.cta(stage, D, t);
+};
+</script>
+<script src="base.js"></script>
+</body></html>

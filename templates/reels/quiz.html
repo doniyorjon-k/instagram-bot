@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="uz"><head><meta charset="utf-8"><link rel="stylesheet" href="base.css">
+<style>
+.q{position:absolute;top:400px;left:88px;right:88px;height:440px;font-size:104px}
+.opts{position:absolute;top:900px;left:88px;right:88px;display:flex;flex-direction:column;gap:28px}
+.opt{position:relative;background:#fff;border:3px solid var(--line);border-radius:36px;height:170px;display:flex;align-items:center;gap:36px;padding:0 160px 0 44px;font-family:'Inter Display';font-weight:600;font-size:60px;letter-spacing:-.02em}
+.opt .k{flex:none;width:96px;height:96px;border-radius:50%;background:var(--mist);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:700}
+.opt .ok{position:absolute;right:44px;width:96px;height:96px;border-radius:50%;background:#fff;color:var(--green);display:flex;align-items:center;justify-content:center;font-size:56px}
+.timer{position:absolute;top:1330px;left:465px;width:150px;height:150px}
+.timer svg{width:150px;height:150px;transform:rotate(-90deg)}
+.timer .n{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Inter Display';font-weight:700;font-size:72px;color:var(--deep)}
+.timer .n span{position:absolute}
+.why{position:absolute;top:1300px;left:88px;right:88px;height:230px}
+.hint{position:absolute;top:1520px;left:88px;right:88px;font-size:32px;color:var(--muted);text-align:center}
+</style></head>
+<body><div id="stage"></div>
+<script>window.DATA = __DATA__;</script>
+<script>
+window.build = (D, R, stage, fit) => {
+  const {$, rise} = R;
+  const hdr = R.header(stage, 'VIKTORINA');
+  const [q, mark] = R.title(stage, 'q big fit', D.q1, D.qmark, D.q2); q.dataset.min = 72;
+  const opts = $('div', 'opts', null, stage);
+  const mk = (k, text) => { const o = $('div', 'opt', null, opts); $('div', 'k', k, o); $('div', null, text, o); const ok = $('div', 'ok', '✓', o); ok.style.opacity = 0; return o; };
+  const A = mk('A', D.a), B = mk('B', D.b);
+  const timer = $('div', 'timer', null, stage);
+  timer.innerHTML = '<svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="66" fill="none" stroke="#DCE5DF" stroke-width="10"/><circle class="arc" cx="75" cy="75" r="66" fill="none" stroke="#15803D" stroke-width="10" stroke-linecap="round" stroke-dasharray="414.7"/></svg><div class="n"><span>3</span><span>2</span><span>1</span></div>';
+  const hint = $('div', 'hint', 'Javobingizni izohda yozing', stage);
+  const why = R.rich(stage, 'why txt fit', D.answer, D.why);
+  fit();
+  [hdr, q, A, B].forEach((el, i) => rise(el, 100 + i * 160));
+  if (mark) R.wipe(mark, 650);
+  const t0 = 1600;
+  timer.animate([{opacity: 0, transform: 'scale(.6)'}, {opacity: 1, transform: 'none'}], {delay: t0 - 300, duration: 400, easing: R.E, fill: 'both'});
+  rise(hint, t0);
+  timer.querySelector('.arc').animate([{strokeDashoffset: 0}, {strokeDashoffset: 414.7}], {delay: t0, duration: 3000, fill: 'both'});
+  timer.querySelectorAll('.n span').forEach((el, i) => el.animate(
+    [{opacity: 0, transform: 'scale(1.4)'}, {opacity: 1, transform: 'scale(1)', offset: .15}, {opacity: 1, offset: .85}, {opacity: 0, transform: 'scale(.8)'}],
+    {delay: t0 + i * 1000, duration: 1000, fill: 'both'}));
+  const r = t0 + 3000;
+  R.fadeOut(timer, r, 250); R.fadeOut(hint, r, 250);
+  const right = D.right.toUpperCase() === 'A' ? A : B, wrong = right === A ? B : A;
+  right.animate([{background: '#fff', borderColor: '#DCE5DF', color: '#0B1F14'}, {background: '#15803D', borderColor: '#15803D', color: '#fff'}], {delay: r, duration: 350, fill: 'both'});
+  right.animate([{transform: 'scale(1)'}, {transform: 'scale(1.04)'}, {transform: 'scale(1)'}], {delay: r, duration: 600, easing: 'ease-out'});
+  right.querySelector('.k').animate([{background: '#F3F7F4', color: '#15803D'}, {background: 'rgba(255,255,255,.18)', color: '#fff'}], {delay: r, duration: 350, fill: 'both'});
+  R.pop(right.querySelector('.ok'), r + 200);
+  wrong.animate([{opacity: 1}, {opacity: .35}], {delay: r, duration: 400, fill: 'forwards'});
+  rise(why, r + 450);
+  return R.cta(stage, D, r + 4200);
+};
+</script>
+<script src="base.js"></script>
+</body></html>

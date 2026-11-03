@@ -3,3 +3,4 @@ __pycache__/
 .pytest_cache/
 templates/_render.html
 .venv/
+templates/reels/_render.html
