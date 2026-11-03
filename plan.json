@@ -1,0 +1,112 @@
+{
+  "publish_time": "19:00",
+  "timezone": "Asia/Tashkent",
+  "draft_lead_hours": 33,
+  "posts": [
+    {
+      "id": "01",
+      "date": "2026-11-05",
+      "topic": "Otbozor bilan tanishing",
+      "idea": "Platforma nima beradi: real e'lonlar, bozor narxlari, to'g'ridan-to'g'ri aloqa",
+      "cta": "Botga kiring, saytni ko'ring"
+    },
+    {
+      "id": "02",
+      "date": "2026-11-07",
+      "topic": "Ot sotib olishdan oldin 7 ta tekshiruv",
+      "idea": "Oyoq, tuyoq, tish, nafas, xulq, hujjat, sinab minish",
+      "cta": "Botda e'lonlarni ko'ring, saytda batafsil"
+    },
+    {
+      "id": "03",
+      "date": "2026-11-09",
+      "topic": "Otni qishga tayyorlash",
+      "idea": "Ozuqa, suv, otxona, yopinchiq, tuyoq parvarishi",
+      "cta": "Botga obuna bo'ling, saytda maqolalar"
+    },
+    {
+      "id": "04",
+      "date": "2026-11-11",
+      "topic": "Otning yoshini tishidan aniqlash",
+      "idea": "Yosh bo'yicha tish belgilari, sodda qo'llanma",
+      "cta": "Botda savol bering, saytda e'lonlar"
+    },
+    {
+      "id": "05",
+      "date": "2026-11-13",
+      "topic": "Qorabayir zoti haqida",
+      "idea": "Kelib chiqishi, xususiyatlari, qayerda ishlatiladi",
+      "cta": "Botda qorabayir e'lonlari, saytda katalog"
+    },
+    {
+      "id": "06",
+      "date": "2026-11-15",
+      "topic": "Otingizni qanday tez sotish mumkin",
+      "idea": "Yaxshi rasm, to'g'ri narx, to'liq tavsif, tez javob",
+      "cta": "Bot orqali e'lon joylang yoki saytda"
+    },
+    {
+      "id": "07",
+      "date": "2026-11-17",
+      "topic": "Ko'pkari oti qanday bo'lishi kerak",
+      "idea": "Chidamlilik, kuch, tayyorgarlik, ozuqa rejimi",
+      "cta": "Botda ko'pkari otlari, saytda ko'pkari bo'limi"
+    },
+    {
+      "id": "08",
+      "date": "2026-11-19",
+      "topic": "Xavfsiz savdo: aldanmaslik uchun 5 qoida",
+      "idea": "Oldindan pul bermaslik, ko'rib olish, hujjat, tekshirilgan e'lonlar",
+      "cta": "Tekshirilgan e'lonlar botda va saytda"
+    },
+    {
+      "id": "09",
+      "date": "2026-11-21",
+      "topic": "Qishki ozuqa ratsioni",
+      "idea": "Pichan, arpa, suli, vitaminlar, tuz, kunlik miqdor",
+      "cta": "Botga obuna bo'ling, saytda maqolalar"
+    },
+    {
+      "id": "10",
+      "date": "2026-11-23",
+      "topic": "Axaltekin zoti haqida",
+      "idea": "Dunyodagi eng qadimgi zotlardan biri, xususiyatlari, narxiga ta'sir qiluvchi omillar",
+      "cta": "Botda axaltekin e'lonlari, saytda katalog"
+    },
+    {
+      "id": "11",
+      "date": "2026-11-25",
+      "topic": "Ot sog'lig'ining 6 ta xavfli belgisi",
+      "idea": "Ishtahasizlik, oqsash, isitma, sanchiq belgilari va qachon vetga murojaat qilish",
+      "cta": "Botga obuna bo'ling, saytda maqolalar"
+    },
+    {
+      "id": "12",
+      "date": "2026-11-27",
+      "topic": "@otbozor_bot: ot bozori Telegramda",
+      "idea": "Bot nima qila oladi: e'lon qidirish, e'lon joylash, yangi e'lonlar haqida xabar",
+      "cta": "Botga kiring, saytni ham ko'ring"
+    },
+    {
+      "id": "13",
+      "date": "2026-11-29",
+      "topic": "Ot narxi nimaga bog'liq",
+      "idea": "Zot, yosh, sog'liq, tayyorgarlik, nasl, mavsum",
+      "cta": "Botda narxlarni solishtiring, saytda bozor narxlari"
+    },
+    {
+      "id": "14",
+      "date": "2026-12-01",
+      "topic": "Tuyoq parvarishi: qish uchun maslahatlar",
+      "idea": "Tozalash, taqa, muz va loydan himoya",
+      "cta": "Botga obuna bo'ling, saytda maqolalar"
+    },
+    {
+      "id": "15",
+      "date": "2026-12-03",
+      "topic": "Oy yakuni: eng ko'p so'ralgan savollar",
+      "idea": "Obunachilar savollariga javoblar, keyingi oy rejasi",
+      "cta": "Bot orqali e'lon joylang yoki saytda"
+    }
+  ]
+}

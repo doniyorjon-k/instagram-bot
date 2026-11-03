@@ -1,0 +1,29 @@
+name: refresh-instagram-token
+
+# Instagram long-lived tokens expire after 60 days. This refreshes it on the
+# 1st and 15th of each month and stores the new one in the IG_ACCESS_TOKEN secret.
+# Needs a GH_PAT secret: a fine-grained token with "Secrets: Read and write"
+# on this repository.
+
+on:
+  schedule:
+    - cron: "0 4 1,15 * *"
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests==2.34.2
+      - name: Refresh and store token
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          NEW=$(python -c "from bot.instagram import Instagram; print(Instagram(user_id='x').refresh_token())")
+          echo "::add-mask::$NEW"
+          gh secret set IG_ACCESS_TOKEN --repo "$GITHUB_REPOSITORY" --body "$NEW"

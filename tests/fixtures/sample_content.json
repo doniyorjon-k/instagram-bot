@@ -1,0 +1,38 @@
+{
+  "label": "Xaridorlar uchun qo'llanma",
+  "cover": {
+    "line1": "Ot olmoqchimisiz?",
+    "highlight": "Avval buni",
+    "line3": "tekshiring.",
+    "card_bold": "7 ta oddiy tekshiruv",
+    "card_text": "sizni aldanishdan va ortiqcha xarajatdan saqlaydi."
+  },
+  "slides": [
+    {
+      "title": "Oyoq va tuyoqlarni sinchiklab ko'ring",
+      "body": "Otni tekis yerda yurgizib ko'ring. Oqsash, shish yoki tuyoqdagi yoriqlar keyinchalik katta xarajatga aylanadi."
+    },
+    {
+      "title": "Tishlarga qarab yoshini aniqlang",
+      "body": "Sotuvchi aytgan yosh tishlar holatiga mos kelishi kerak. Shubha bo'lsa, veterinardan so'rang."
+    },
+    {
+      "title": "Nafas olishiga e'tibor bering",
+      "body": "Yugurtirib ko'rgandan keyin nafas tez tiklanishi kerak. Xirillash yoki yo'tal kasallik belgisi bo'lishi mumkin."
+    }
+  ],
+  "cta": {
+    "title": "Tekshirilgan otlar bitta joyda",
+    "body": "Yangi e'lonlar, bozor narxlari va sotuvchi bilan to'g'ridan-to'g'ri aloqa Telegram botimizda."
+  },
+  "caption": "Ot sotib olish katta qaror, unga shoshilmasdan tayyorlaning. Sotuvchi qanchalik ishonchli ko'rinmasin, xariddan oldin otni o'zingiz yaxshilab tekshirishingiz kerak. Biz eng muhim 7 ta tekshiruvni bir joyga yig'dik.\n\nOyoq va tuyoqlar: otni tekis yerda yurgizib, oqsash bor-yo'qligini ko'ring.\nTishlar: aytilgan yosh tishlar holatiga mos kelishini tekshiring.\nNafas: yugurtirgandan keyin nafas tez tiklanishi kerak.\nXulq: ot odamga qanday munosabatda bo'lishini kuzating.\nHujjatlar: kelib chiqishi va emlash hujjatlarini so'rang.\n\nShubha bo'lsa, xariddan oldin veterinarni chaqiring. Bu kichik xarajat katta yo'qotishdan saqlaydi.",
+  "hashtags": [
+    "#otbozor",
+    "#ot",
+    "#otsavdosi",
+    "#kopkari"
+  ],
+  "sources": [
+    "https://example.com/horse-buying-guide"
+  ]
+}
