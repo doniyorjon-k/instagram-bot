@@ -254,3 +254,40 @@ def test_facebook_token_uses_graph_facebook_and_finds_account():
     ig.publish_carousel(["https://a/1.jpg"], "cap")
     assert http.calls[0][1].startswith("https://graph.facebook.com/") and http.calls[0][1].endswith("/me/accounts")
     assert http.calls[1][1].endswith("/1784/media")
+
+
+class FakeHead:
+    def __init__(self, codes):
+        self.codes, self.urls = list(codes), []
+
+    def head(self, url, timeout=None, allow_redirects=None):
+        self.urls.append(url)
+        return type("R", (), {"status_code": self.codes.pop(0)})()
+
+
+def _draft_files(n=2):
+    out = storage.ROOT / "drafts" / "99"
+    return [out / f"{i + 1:02d}.jpg" for i in range(n)]
+
+
+def test_github_urls_pin_commit_and_check_public(monkeypatch):
+    monkeypatch.delenv("CLOUDINARY_URL", raising=False)
+    monkeypatch.setenv("GITHUB_REPOSITORY", "otbozor/instagram-bot")
+    calls = []
+
+    def git(*args):
+        calls.append(args[0] if args[0] != "-c" else "commit")
+        return {"diff": "drafts/99/01.jpg", "rev-parse": "abc123"}.get(args[0], "")
+
+    http = FakeHead([200, 404, 200])
+    urls = storage.github_urls(_draft_files(), session=http, git=git, sleep=lambda s: None)
+    assert urls == ["https://raw.githubusercontent.com/otbozor/instagram-bot/abc123/drafts/99/01.jpg",
+                    "https://raw.githubusercontent.com/otbozor/instagram-bot/abc123/drafts/99/02.jpg"]
+    assert calls == ["add", "diff", "commit", "push", "rev-parse"]
+
+
+def test_github_urls_explain_private_repo(monkeypatch):
+    monkeypatch.setenv("GITHUB_REPOSITORY", "otbozor/instagram-bot")
+    git = lambda *a: "abc" if a[0] == "rev-parse" else ""
+    with pytest.raises(RuntimeError, match="public"):
+        storage.github_urls(_draft_files(1), session=FakeHead([404] * 5), git=git, sleep=lambda s: None)

@@ -32,8 +32,8 @@ orqali qo'shiladi. Ularni hech qachon kodga yoki chatga yozmang.
 | `TELEGRAM_ADMIN_ID` | Pastdagi 2-qadam |
 | `GEMINI_API_KEY` | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) (bepul) |
 | `ANTHROPIC_API_KEY` | Ixtiyoriy, Gemini o'rniga Claude uchun: [console.anthropic.com](https://console.anthropic.com) |
-| `CLOUDINARY_URL` | [cloudinary.com](https://cloudinary.com) (bepul) → Dashboard → API Environment variable |
 | `IG_ACCESS_TOKEN` | Pastdagi 4-qadam |
+| `IG_USER_ID` | Ixtiyoriy, Instagram biznes akkaunt ID (4-qadam) |
 | `GH_PAT` | Ixtiyoriy, Instagram tokenini avtomatik yangilash uchun (5-qadam) |
 
 ### 1. Telegram bot
@@ -50,8 +50,12 @@ Shundan keyin bot faqat sizning buyruqlaringizni qabul qiladi.
 almashtirish mumkin (standart: `gemini-2.5-flash`).
 
 ### 4. Instagram
-Instagram rasmni faqat ochiq URL orqali qabul qiladi, shuning uchun slaydlar Cloudinary'ga yuklanadi
-(`CLOUDINARY_URL`).
+Instagram rasmni faqat ochiq URL orqali qabul qiladi. Shuning uchun repo **public** bo'lishi kerak:
+slaydlar `drafts/` papkasiga commit qilinadi va Instagram ularni `raw.githubusercontent.com` dan oladi.
+Kalitlar Secrets'da turadi, ular public repo'da ham ko'rinmaydi.
+Repo'ni ochish: **Settings → General → Danger Zone → Change visibility → Public**.
+
+(Ixtiyoriy: Cloudinary ishlaydigan joyda `CLOUDINARY_URL` secretini qo'ysangiz, rasmlar o'sha yerga yuklanadi.)
 
 Token olish (Meta Developer, 2026-yil noyabr holatidagi menyu):
 1. [developers.facebook.com/apps](https://developers.facebook.com/apps) → **Create app** → Instagram'ni boshqarish use case'i.
