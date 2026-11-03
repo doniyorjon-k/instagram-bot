@@ -1,4 +1,65 @@
 {
   "tg_offset": null,
-  "posts": {}
+  "posts": {
+    "01": {
+      "status": null,
+      "attempts": 0
+    },
+    "02": {
+      "status": null,
+      "attempts": 0
+    },
+    "03": {
+      "status": null,
+      "attempts": 0
+    },
+    "04": {
+      "status": null,
+      "attempts": 0
+    },
+    "05": {
+      "status": null,
+      "attempts": 0
+    },
+    "06": {
+      "status": null,
+      "attempts": 0
+    },
+    "07": {
+      "status": null,
+      "attempts": 0
+    },
+    "08": {
+      "status": null,
+      "attempts": 0
+    },
+    "09": {
+      "status": null,
+      "attempts": 0
+    },
+    "10": {
+      "status": null,
+      "attempts": 0
+    },
+    "11": {
+      "status": null,
+      "attempts": 0
+    },
+    "12": {
+      "status": null,
+      "attempts": 0
+    },
+    "13": {
+      "status": null,
+      "attempts": 0
+    },
+    "14": {
+      "status": null,
+      "attempts": 0
+    },
+    "15": {
+      "status": null,
+      "attempts": 0
+    }
+  }
 }
