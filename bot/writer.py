@@ -114,7 +114,7 @@ def _gemini(prompt: str) -> str:
 
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
     resp = client.models.generate_content(
-        model=os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"),
+        model=os.environ.get("GEMINI_MODEL") or "gemini-2.5-flash",
         contents=prompt,
         config=types.GenerateContentConfig(
             system_instruction=SYSTEM,
@@ -131,7 +131,7 @@ def _claude(prompt: str) -> str:
     messages = [{"role": "user", "content": prompt}]
     for _ in range(5):
         resp = client.beta.messages.create(
-            model=os.environ.get("CLAUDE_MODEL", "claude-opus-5-5"),
+            model=os.environ.get("CLAUDE_MODEL") or "claude-opus-5-5",
             max_tokens=16000,
             system=SYSTEM,
             betas=["server-side-fallback-2026-07-01"],

@@ -19,7 +19,7 @@ class Instagram:
                  session: requests.Session | None = None, sleep=time.sleep):
         self.token = token or os.environ["IG_ACCESS_TOKEN"]
         self.user_id = user_id or os.environ.get("IG_USER_ID") or None
-        self.version = os.environ.get("IG_API_VERSION", "v23.0")
+        self.version = os.environ.get("IG_API_VERSION") or "v23.0"
         self.http = session or requests.Session()
         self.sleep = sleep
         self.facebook = self.token.startswith("EAA")
@@ -45,7 +45,7 @@ class Instagram:
         accounts = [p["instagram_business_account"] for p in pages if p.get("instagram_business_account")]
         if not accounts:
             raise RuntimeError("Tokenga ulangan Instagram biznes akkaunti topilmadi. IG_USER_ID secretini qo'ying.")
-        wanted = os.environ.get("IG_USERNAME", "otbozor.uz")
+        wanted = os.environ.get("IG_USERNAME") or "otbozor.uz"
         match = next((a for a in accounts if a.get("username") == wanted), accounts[0])
         self.user_id = str(match["id"])
         return self.user_id
