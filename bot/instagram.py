@@ -1,4 +1,11 @@
-"""Publish a carousel with the Instagram API (Instagram Login, graph.instagram.com)."""
+"""Publish a carousel with the Instagram API.
+
+Two token types work:
+- Instagram Login tokens ("IGAA..."): graph.instagram.com, expire in 60 days.
+- Facebook / Unified login tokens ("EAA...", e.g. a system-user token that never
+  expires): graph.facebook.com, the Instagram business account is found through
+  the Facebook Page it is connected to.
+"""
 from __future__ import annotations
 
 import os
@@ -15,10 +22,12 @@ class Instagram:
         self.version = os.environ.get("IG_API_VERSION", "v23.0")
         self.http = session or requests.Session()
         self.sleep = sleep
+        self.facebook = self.token.startswith("EAA")
+        self.host = "graph.facebook.com" if self.facebook else "graph.instagram.com"
 
     def _req(self, method: str, path: str, **params):
         params["access_token"] = self.token
-        url = f"https://graph.instagram.com/{self.version}/{path}"
+        url = f"https://{self.host}/{self.version}/{path}"
         r = self.http.request(method, url, params=params if method == "GET" else None,
                               data=params if method == "POST" else None, timeout=60)
         body = r.json()
@@ -27,8 +36,18 @@ class Instagram:
         return body
 
     def me(self) -> str:
-        if not self.user_id:
+        if self.user_id:
+            return self.user_id
+        if not self.facebook:
             self.user_id = str(self._req("GET", "me", fields="user_id,username")["user_id"])
+            return self.user_id
+        pages = self._req("GET", "me/accounts", fields="instagram_business_account{id,username}").get("data", [])
+        accounts = [p["instagram_business_account"] for p in pages if p.get("instagram_business_account")]
+        if not accounts:
+            raise RuntimeError("Tokenga ulangan Instagram biznes akkaunti topilmadi. IG_USER_ID secretini qo'ying.")
+        wanted = os.environ.get("IG_USERNAME", "otbozor.uz")
+        match = next((a for a in accounts if a.get("username") == wanted), accounts[0])
+        self.user_id = str(match["id"])
         return self.user_id
 
     def _wait_ready(self, container_id: str, tries: int = 20):

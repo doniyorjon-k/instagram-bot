@@ -53,17 +53,18 @@ almashtirish mumkin (standart: `gemini-2.5-flash`).
 Instagram rasmni faqat ochiq URL orqali qabul qiladi, shuning uchun slaydlar Cloudinary'ga yuklanadi
 (`CLOUDINARY_URL`).
 
-Token olish:
-1. [developers.facebook.com](https://developers.facebook.com/apps) → **Create app** → turini **Business** tanlang.
-2. Ilovaga **Instagram** mahsulotini qo'shing → **API setup with Instagram login**.
-3. **Generate access tokens** bo'limida otbozor.uz akkauntini qo'shing va kiring.
-   Ruxsatlar: `instagram_business_basic`, `instagram_business_content_publish`.
-4. Chiqqan tokenni `IG_ACCESS_TOKEN` secretiga qo'ying.
+Token olish (Meta Developer, 2026-yil noyabr holatidagi menyu):
+1. [developers.facebook.com/apps](https://developers.facebook.com/apps) → **Create app** → Instagram'ni boshqarish use case'i.
+2. **Use cases → Customize → API setup with Unified login**. So'ralsa, ilovani "Otbozor" biznes portfeliga ulang.
+3. **Create new configuration**: System-user access token, Business assets'da otbozor.uz Instagram akkauntini tanlang,
+   `instagram_basic` va `instagram_content_publish` ruxsatlari belgilangan bo'lsin.
+4. Chiqqan tokenni `IG_ACCESS_TOKEN` secretiga qo'ying. Bu token muddatsiz.
 
-Ilova "Development" rejimida qolishi mumkin, chunki faqat o'z akkauntingizga joylaysiz.
+Bot Instagram akkauntini token orqali o'zi topadi. Topa olmasa, Instagram biznes akkaunt ID raqamini
+`IG_USER_ID` secretiga qo'ying.
 
-### 5. Tokenni avtomatik yangilash (ixtiyoriy)
-Instagram tokeni 60 kunda eskiradi. `refresh-instagram-token` workflow uni har oyning 1 va 15-sanasida
+### 5. Tokenni avtomatik yangilash (faqat `IGAA` bilan boshlanadigan token uchun)
+Unified login'dagi system-user token muddatsiz, unga bu qadam kerak emas. Instagram Login tokeni esa 60 kunda eskiradi. `refresh-instagram-token` workflow uni har oyning 1 va 15-sanasida
 yangilaydi. Buning uchun GitHub'da **Settings → Developer settings → Fine-grained tokens** orqali shu repo
 uchun "Secrets: Read and write" ruxsatli token yarating va uni `GH_PAT` secretiga qo'ying.
 Aks holda tokenni har 2 oyda qo'lda yangilang.

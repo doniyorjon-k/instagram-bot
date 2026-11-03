@@ -240,3 +240,17 @@ def test_instagram_carousel_flow():
     parent_call = http.calls[4]
     assert parent_call[2]["children"] == "c1,c2" and parent_call[2]["media_type"] == "CAROUSEL"
     assert http.calls[7][1].endswith("/u1/media_publish")
+
+
+def test_facebook_token_uses_graph_facebook_and_finds_account():
+    http = FakeHTTP([
+        {"data": [{"id": "page1"}, {"id": "page2", "instagram_business_account": {"id": "1784", "username": "otbozor.uz"}}]},
+        {"id": "c1"}, {"status_code": "FINISHED"},
+        {"id": "parent"}, {"status_code": "FINISHED"},
+        {"id": "media9"}, {"permalink": "https://instagram.com/p/abc"},
+    ])
+    ig = Instagram(token="EAAtest", session=http, sleep=lambda s: None)
+    ig.user_id = None
+    ig.publish_carousel(["https://a/1.jpg"], "cap")
+    assert http.calls[0][1].startswith("https://graph.facebook.com/") and http.calls[0][1].endswith("/me/accounts")
+    assert http.calls[1][1].endswith("/1784/media")
