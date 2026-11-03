@@ -122,7 +122,7 @@ def _gemini(prompt: str) -> str:
     from google.genai import errors, types
 
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"],
-                          http_options=types.HttpOptions(timeout=240_000))
+                          http_options=types.HttpOptions(timeout=120_000))
     models = [m.strip() for m in (os.environ.get("GEMINI_MODEL") or "").split(",") if m.strip()] or GEMINI_MODELS
     search = os.environ.get("GEMINI_SEARCH", "auto").lower() != "off"
 
