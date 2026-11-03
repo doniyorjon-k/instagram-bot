@@ -199,7 +199,7 @@ def test_failures_stop_after_three_attempts(tmp_path, content):
         bot.run()
     s = bot.state["posts"]["01"]
     assert s["status"] == "error" and s["attempts"] == 3
-    assert "LLM down" in bot.tg.sent[-1][1]
+    assert any("LLM down" in m[1] for m in bot.tg.sent)
 
 
 def test_unknown_user_gets_chat_id_when_admin_unset(tmp_path, content, monkeypatch):
@@ -394,3 +394,39 @@ def test_instagram_reel_flow():
     ig = Instagram(token="t", user_id="u1", session=http, sleep=lambda s: None)
     assert ig.publish_reel("https://v/reel.mp4", "cap")["permalink"].endswith("/a")
     assert http.calls[0][2]["media_type"] == "REELS" and http.calls[0][2]["video_url"] == "https://v/reel.mp4"
+
+
+def test_next_month_plan_is_proposed_and_appended(tmp_path, content):
+    plan = json.loads(json.dumps(PLAN))
+    plan["posts"].append({"id": "R01", "type": "reel", "format": "quiz", "date": "2026-11-06",
+                          "topic": "t", "idea": "i", "cta": "bot"})
+    seen = {}
+
+    def write_plan(posts, formats, used, feedback=None):
+        seen.update(posts=posts, formats=formats, used=used, feedback=feedback)
+        return {"posts": [{"topic": f"P{i}", "idea": "x"} for i in range(len(posts))],
+                "reels": [{"topic": f"R{i}", "idea": "x"} for i in range(len(formats))]}
+
+    tg = FakeTG()
+    bot = Bot(plan, {"tg_offset": None, "posts": {}}, tg, now=datetime(2026, 11, 1, 10, 0, tzinfo=TZ),
+              drafts_dir=tmp_path, write_plan=write_plan, write=lambda p, fb=None: content, render=fake_render)
+    bot.propose_plan()
+    assert "plan_proposal" not in bot.state  # too early (more than 5 days before the plan ends)
+    bot.now = datetime(2026, 11, 3, 10, 0, tzinfo=TZ)
+    bot.propose_plan()
+    prop = bot.state["plan_proposal"]
+    assert prop["status"] == "sent" and seen["posts"][0] == "2026-11-09" and seen["formats"][0] == "myth"
+    assert set(seen["used"]) == {"A", "B", "t"}
+    ids = [i["id"] for i in prop["items"]]
+    assert "03" in ids and "R02" in ids and len(ids) == 29
+    # reply with a comment -> rewritten with the feedback
+    tg._updates = [{"update_id": 3, "message": {"chat": {"id": 42}, "text": "Ko'pkari ko'proq",
+                                                "reply_to_message": {"message_id": prop["message_id"]}}}]
+    bot.handle_updates()
+    bot.propose_plan()
+    assert seen["feedback"] == "Ko'pkari ko'proq" and bot.state["plan_proposal"]["status"] == "sent"
+    tg._updates = [cb("pok:plan")]
+    bot.handle_updates()
+    assert bot.plan_changed and len(bot.plan["posts"]) == 3 + 29
+    bot.propose_plan()  # the new plan ends later, nothing new is proposed yet
+    assert bot.state["plan_proposal"]["status"] == "approved"

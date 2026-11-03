@@ -49,11 +49,12 @@ class Bot:
     def __init__(self, plan: dict, state: dict, tg: Telegram, ig_factory=None,
                  write=writer.write_post, render=render_mod.render, upload=storage.upload,
                  now: datetime | None = None, drafts_dir: Path = DRAFTS,
-                 write_reel=writer.write_reel, render_reel=None):
+                 write_reel=writer.write_reel, render_reel=None, write_plan=writer.write_plan):
         self.plan, self.state, self.tg = plan, state, tg
         self.ig_factory = ig_factory or Instagram
         self.write, self.render, self.upload = write, render, upload
-        self.write_reel = write_reel
+        self.write_reel, self.write_plan = write_reel, write_plan
+        self.plan_changed = False
         self.render_reel = render_reel or (lambda kind, c, out, cover: reel_mod.render(kind, c, out, cover=cover))
         self.tz = ZoneInfo(plan.get("timezone", "Asia/Tashkent"))
         self.now = now or datetime.now(self.tz)
@@ -115,6 +116,11 @@ class Bot:
         if text.startswith("/start") or text.startswith("/holat"):
             self.tg.send(chat, self.status_text())
             return
+        if text.startswith("/reja"):
+            self.propose_plan(force=True)
+            if self.state["plan_proposal"]["status"] != "sent":
+                self.tg.send(chat, "Reja hozir tuzilmadi, keyingi tekshiruvda yana urinib ko'riladi.")
+            return
         if text.startswith("/qayta"):
             arg = text.split()[-1].upper() if len(text.split()) > 1 else ""
             pid = arg.zfill(2) if arg.isdigit() else arg
@@ -126,6 +132,11 @@ class Bot:
                 self.tg.send(chat, "Foydalanish: /qayta 03 yoki /qayta R01")
             return
         reply = msg.get("reply_to_message", {}).get("message_id")
+        prop = self.state.get("plan_proposal") or {}
+        if reply and text and reply == prop.get("message_id") and prop.get("status") == "sent":
+            prop.update(status="regen", feedback=text, attempts=0)
+            self.tg.send(chat, "Izoh qabul qilindi, reja qayta tuziladi.")
+            return
         pid = self.find_by_message(reply) if reply else None
         if pid and text:
             s = self.st(pid)
@@ -150,6 +161,8 @@ class Bot:
             self.tg.answer(cq["id"], "Ruxsat yo'q")
             return
         action, _, pid = cq.get("data", "").partition(":")
+        if action in ("pok", "pre"):
+            return self.on_plan_button(cq, action)
         s = self.st(pid)
         if s["status"] not in ("draft_sent",):
             self.tg.answer(cq["id"], f"Bu post holati: {STATUS_UZ.get(s['status'], s['status'])}")
@@ -192,10 +205,28 @@ class Bot:
                 except Exception as e:
                     self.fail(p["id"], "matn/rasm", e)
 
+    def history(self, exclude: str) -> list[str]:
+        """Short summaries of content already written, so new drafts don't repeat it."""
+        out = []
+        for p in self.plan["posts"]:
+            s = self.state["posts"].get(p["id"], {})
+            f = self.drafts / p["id"] / "content.json"
+            if p["id"] == exclude or s.get("status") not in ("draft_sent", "approved", "published") or not f.exists():
+                continue
+            c = load(f)
+            if p.get("type") == "reel":
+                keys = ("q1", "qmark", "q2", "answer", "myth", "fact", "number", "unit")
+                bits = " ".join(str(c[k]) for k in keys if c.get(k))
+                bits += " ".join(f" {i.get('bad')}" for i in c.get("items", []))
+            else:
+                bits = "; ".join(sl.get("title", "") for sl in c.get("slides", []))
+            out.append(f"{p['topic']}: {bits}"[:220])
+        return out[-40:]
+
     def draft(self, p: dict, feedback: str | None):
         pid = p["id"]
         is_reel = p.get("type") == "reel"
-        content = (self.write_reel if is_reel else self.write)(p, feedback)
+        content = (self.write_reel if is_reel else self.write)({**p, "avoid": self.history(pid)}, feedback)
         out = self.drafts / pid
         for old in [*out.glob("*.jpg"), *out.glob("*.mp4")] if out.exists() else []:
             old.unlink()
@@ -268,16 +299,110 @@ class Bot:
                  ig_media_id=result["id"], permalink=result.get("permalink"))
         self.notify(f"#{pid} Instagram'ga joylandi: {result.get('permalink') or result['id']}")
 
+    # ---------- next month ----------
+    PLAN_LEAD_DAYS = 5
+
+    def next_slots(self) -> tuple[list[str], list[str], list[str]]:
+        """Dates for the next 30 days: a post every 2 days, a Reel on the days between."""
+        posts = [p for p in self.plan["posts"] if p.get("type") != "reel"]
+        reels = [p for p in self.plan["posts"] if p.get("type") == "reel"]
+        start = max(datetime.fromisoformat(p["date"]) for p in self.plan["posts"]) + timedelta(days=1)
+        last_post = max([datetime.fromisoformat(p["date"]) for p in posts] or [start - timedelta(days=2)])
+        first = last_post + timedelta(days=2)
+        while first < start:
+            first += timedelta(days=2)
+        post_dates = [(first + timedelta(days=2 * i)).date().isoformat() for i in range(15)]
+        reel_dates = [(first + timedelta(days=2 * i + 1)).date().isoformat() for i in range(14)]
+        if start < first:  # a gap day right after the old plan gets a Reel too
+            reel_dates.insert(0, start.date().isoformat())
+            reel_dates.pop()
+        order = list(reel_mod.FORMATS)
+        last_fmt = reels[-1]["format"] if reels else order[-1]
+        k = order.index(last_fmt) + 1
+        formats = [order[(k + i) % len(order)] for i in range(len(reel_dates))]
+        return post_dates, reel_dates, formats
+
+    def propose_plan(self, force: bool = False):
+        last = max(self.publish_at(p) for p in self.plan["posts"])
+        key = last.date().isoformat()
+        prop = self.state.get("plan_proposal")
+        current = prop if prop and prop.get("for_after") == key else None
+        if force:
+            current = {"status": "regen", "attempts": 0, "feedback": None, "for_after": key}
+            self.state["plan_proposal"] = current
+        if current and current["status"] in ("sent", "approved", "error"):
+            return
+        if not current:
+            if self.now < last - timedelta(days=self.PLAN_LEAD_DAYS):
+                return
+            current = {"status": "regen", "attempts": 0, "feedback": None, "for_after": key}
+            self.state["plan_proposal"] = current
+        prop = current
+        post_dates, reel_dates, formats = self.next_slots()
+        used = [p["topic"] for p in self.plan["posts"]]
+        try:
+            data = self.write_plan(post_dates, formats, used, prop.get("feedback"))
+        except Exception as e:
+            traceback.print_exc()
+            prop["attempts"] = prop.get("attempts", 0) + 1
+            if prop["attempts"] >= MAX_ATTEMPTS:
+                prop["status"] = "error"
+                self.notify(f"Keyingi oy rejasini tuzib bo'lmadi: {e}\nQayta urinish uchun: /reja")
+            return
+        n = max([int(p["id"]) for p in self.plan["posts"] if p["id"].isdigit()] or [0])
+        r = max([int(p["id"][1:]) for p in self.plan["posts"] if p["id"].startswith("R")] or [0])
+        items = [{"id": f"{n + i + 1:02d}", "date": d, "topic": x["topic"], "idea": x["idea"], "cta": "bot"}
+                 for i, (d, x) in enumerate(zip(post_dates, data["posts"]))]
+        items += [{"id": f"R{r + i + 1:02d}", "type": "reel", "format": f, "date": d, "topic": x["topic"],
+                   "idea": x["idea"], "cta": "bot"}
+                  for i, (d, f, x) in enumerate(zip(reel_dates, formats, data["reels"]))]
+        items.sort(key=lambda x: x["date"])
+        lines = [f"Keyingi 30 kunlik reja ({items[0]['date'][5:]} - {items[-1]['date'][5:]}):", ""]
+        for it in items:
+            kind = f"Reels, {FORMAT_UZ[it['format']]}" if it.get("type") == "reel" else "Post"
+            lines.append(f"#{it['id']} {it['date'][5:]} ({kind}) {it['topic']}")
+        lines += ["", "O'zgartirish kerak bo'lsa, shu xabarga reply qilib izoh yozing."]
+        msg = self.notify("\n".join(lines)[:4096], buttons=[[
+            {"text": "Rejani tasdiqlash", "callback_data": "pok:plan"},
+            {"text": "Qayta tuzish", "callback_data": "pre:plan"}]])
+        prop.update(status="sent", items=items, feedback=None, attempts=0,
+                    message_id=msg["message_id"] if msg else None)
+
+    def on_plan_button(self, cq: dict, action: str):
+        chat = cq["message"]["chat"]["id"]
+        prop = self.state.get("plan_proposal") or {}
+        if prop.get("status") != "sent":
+            self.tg.answer(cq["id"], "Bu reja allaqachon ko'rib chiqilgan")
+            return
+        self.tg.clear_buttons(chat, cq["message"]["message_id"])
+        if action == "pok":
+            self.plan["posts"].extend(prop["items"])
+            self.plan["posts"].sort(key=lambda x: x["date"])
+            self.plan_changed = True
+            prop["status"] = "approved"
+            self.state["plan_end_notified"] = False
+            self.tg.answer(cq["id"], "Reja tasdiqlandi")
+            self.tg.send(chat, f"Yangi reja qo'shildi: {len(prop['items'])} ta post va Reels. "
+                               "Loyihalar odatdagidek bir kun oldin keladi.")
+        else:
+            prop.update(status="regen", feedback=None, attempts=0)
+            self.tg.answer(cq["id"], "Qayta tuziladi")
+            self.tg.send(chat, "Reja qayta tuziladi. Izoh qo'shmoqchi bo'lsangiz, reja xabariga reply qiling.")
+
     def check_plan_end(self):
         last = max(self.publish_at(p) for p in self.plan["posts"])
         if self.now > last and not self.state.get("plan_end_notified"):
             self.state["plan_end_notified"] = True
-            self.notify("30 kunlik reja tugadi. Keyingi oy uchun yangi reja kerak.")
+            self.notify("Joriy reja tugadi. Yangi rejani tasdiqlamaguningizcha yangi post chiqmaydi.")
 
     def run(self):
         self.handle_updates()
         self.make_drafts()
         self.publish_due()
+        try:
+            self.propose_plan()
+        except Exception:  # planning must never block drafts or publishing
+            traceback.print_exc()
         self.check_plan_end()
 
 
@@ -288,6 +413,8 @@ def main():
         bot.run()
     finally:
         save(STATE, state)
+        if bot.plan_changed:
+            save(PLAN, plan)
 
 
 if __name__ == "__main__":

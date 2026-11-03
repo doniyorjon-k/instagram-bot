@@ -23,6 +23,13 @@ Postlar orasidagi kunlarda bot 10-18 soniyalik animatsion Reels yasaydi. 4 forma
 viktorina (A yoki B), afsona va haqiqat, bilasizmi (raqamli fakt), 3 ta xato. Reels ham xuddi post kabi
 Telegram'ga video bo'lib keladi va faqat tasdiqlangandan keyin joylanadi. Rejada ular `R01`, `R02`, ... deb belgilangan.
 Bot kuniga bittadan ortiq narsa joylamaydi: kech tasdiqlangan post yoki Reels keyingi bo'sh kunning 19:00 iga o'tadi.
+Fon musiqasi `assets/music/` da: uni `tools/make_music.py` noldan sintez qiladi, shuning uchun litsenziya muammosi yo'q.
+
+### Takrorlanmaslik va keyingi oy
+Har bir yangi loyiha yozilayotganda AI'ga avval chiqqan post va Reels mazmuni beriladi va ularni takrorlamaslik so'raladi.
+Reja tugashidan 5 kun oldin bot keyingi 30 kunlik rejani (15 post + 14 Reels) o'zi tuzib, Telegram'ga yuboradi.
+"Rejani tasdiqlash" bosilsa, u `plan.json` ga qo'shiladi; reply bilan izoh yozsangiz, qayta tuziladi.
+Rejani qo'lda so'rash: `/reja`.
 
 Hammasi GitHub Actions'da har 30 daqiqada (08:00 dan 23:30 gacha, Toshkent vaqti) ishlaydi.
 Holat `data/state.json`, tayyor slaydlar `drafts/` papkasida saqlanadi.

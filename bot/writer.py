@@ -58,6 +58,9 @@ def build_prompt(post: dict, feedback: str | None = None) -> str:
         "",
         FORMAT,
     ]
+    if post.get("avoid"):
+        lines += ["", "Sahifada avval chiqqan kontent. Bu fakt, raqam, savol va maslahatlarni TAKRORLAMA, yangi ma'lumot ber:"]
+        lines += [f"- {a}" for a in post["avoid"]]
     if feedback:
         lines += ["", "Oldingi variantga egasining izohi (albatta hisobga ol):", feedback]
     return "\n".join(lines)
@@ -273,6 +276,9 @@ def build_reel_prompt(item: dict, feedback: str | None = None) -> str:
         + (" Oxirida izohda javob yozishga chaqir." if kind == "quiz" else ""),
         "hashtags: 8-12 ta, #otbozor bilan. sources: foydalangan manbalaring.",
     ]
+    if item.get("avoid"):
+        lines += ["", "Sahifada avval chiqqan kontent. Bu fakt, raqam, savol va maslahatlarni TAKRORLAMA, yangi ma'lumot ber:"]
+        lines += [f"- {a}" for a in item["avoid"]]
     if feedback:
         lines += ["", "Oldingi variantga egasining izohi (albatta hisobga ol):", feedback]
     return "\n".join(lines)
@@ -333,3 +339,46 @@ def write_reel(item: dict, feedback: str | None = None, call=None) -> dict:
         prompt = build_reel_prompt(item, feedback) + (
             "\n\nOldingi javobingda xatolar bor edi, tuzatib qayta yoz:\n- " + "\n- ".join(last_errs))
     raise RuntimeError("Reels matni talablarga mos kelmadi: " + "; ".join(last_errs))
+
+
+# ---------- next month's plan ----------
+
+def build_plan_prompt(posts: list[str], reel_formats: list[str], used: list[str], feedback: str | None = None) -> str:
+    lines = [
+        "Otbozor Instagram sahifasi uchun keyingi 30 kunlik kontent rejasini tuz.",
+        f"Karusel postlar: {len(posts)} ta (sanalari: {', '.join(posts)}).",
+        f"Reels: {len(reel_formats)} ta, formatlari tartib bilan: {', '.join(reel_formats)}.",
+        "Formatlar: quiz = A/B viktorina savoli, myth = afsona va haqiqat, fact = bitta raqamli fakt, "
+        "mistakes = 3 ta xato ro'yxati.",
+        "Mavzular: ot sotib olish va sotish, parvarish, ozuqa, sog'liq, zotlar, ko'pkari, mavsumga oid maslahatlar, "
+        "Otbozor platformasi va @otbozor_bot imkoniyatlari (oyiga 2 tadan ko'p emas).",
+        "",
+        "Avval chiqqan mavzular (TAKRORLAMA, yangi burchakdan yondash):",
+        *[f"- {u}" for u in used],
+        "",
+        "Javobni FAQAT bitta ```json ... ``` blokida ber:",
+        '{"posts": [{"topic": "<=50 belgi", "idea": "1-2 gap"}], "reels": [{"topic": "<=50 belgi", "idea": "1 gap"}]}',
+        "posts va reels ro'yxatlari aynan yuqoridagi sonda va tartibda bo'lsin.",
+    ]
+    if feedback:
+        lines += ["", "Oldingi reja variantiga egasining izohi (albatta hisobga ol):", feedback]
+    return "\n".join(lines)
+
+
+def write_plan(posts: list[str], reel_formats: list[str], used: list[str], feedback: str | None = None,
+               call=None) -> dict:
+    call = call or (_gemini if provider() == "gemini" else _claude)
+    prompt = build_plan_prompt(posts, reel_formats, used, feedback)
+    errs: list[str] = []
+    for _ in range(3):
+        try:
+            data = extract_json(call(prompt))
+            ok = (len(data["posts"]) == len(posts) and len(data["reels"]) == len(reel_formats)
+                  and all(x.get("topic") and x.get("idea") for x in data["posts"] + data["reels"]))
+            if ok:
+                return data
+            errs = ["posts yoki reels soni noto'g'ri yoki bo'sh mavzu bor"]
+        except (ValueError, KeyError, TypeError, json.JSONDecodeError):
+            errs = ["JSON topilmadi yoki buzilgan"]
+        prompt = build_plan_prompt(posts, reel_formats, used, feedback) + "\n\nXato: " + "; ".join(errs)
+    raise RuntimeError("Reja tuzilmadi: " + "; ".join(errs))

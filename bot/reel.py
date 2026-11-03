@@ -16,6 +16,9 @@ ROOT = Path(__file__).resolve().parent.parent
 TEMPLATES = ROOT / "templates" / "reels"
 FORMATS = ("quiz", "myth", "fact", "mistakes")
 FPS = 30
+MUSIC_DIR = ROOT / "assets" / "music"
+# Own synthesized tracks (tools/make_music.py), so no licence issues.
+MUSIC = {"quiz": "yengil", "myth": "iliq", "fact": "sokin", "mistakes": "yengil"}
 
 
 def build_html(kind: str, data: dict) -> str:
@@ -29,6 +32,9 @@ def render(kind: str, data: dict, out: Path, music: Path | None = None, cover: P
     """Write the Reel to `out`. If `cover` is given, also save a JPEG cover frame there."""
     from playwright.sync_api import sync_playwright
 
+    if music is None and os.environ.get("REEL_MUSIC", "on") != "off":
+        track = MUSIC_DIR / f"{MUSIC.get(kind, 'yengil')}.m4a"
+        music = track if track.exists() else None
     out.parent.mkdir(parents=True, exist_ok=True)
     page_file = TEMPLATES / "_render.html"
     page_file.write_text(build_html(kind, data), encoding="utf-8")

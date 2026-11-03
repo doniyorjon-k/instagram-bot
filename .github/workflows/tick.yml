@@ -43,6 +43,6 @@ jobs:
         run: |
           git config user.name "otbozor-bot"
           git config user.email "otbozor-bot@users.noreply.github.com"
-          git add data drafts
+          git add data drafts plan.json
           git diff --cached --quiet || git commit -m "tick: update state"
           git push
