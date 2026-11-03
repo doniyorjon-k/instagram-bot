@@ -291,3 +291,23 @@ def test_github_urls_explain_private_repo(monkeypatch):
     git = lambda *a: "abc" if a[0] == "rev-parse" else ""
     with pytest.raises(RuntimeError, match="public"):
         storage.github_urls(_draft_files(1), session=FakeHead([404] * 5), git=git, sleep=lambda s: None)
+
+
+def test_late_approvals_publish_one_per_day_at_publish_time(tmp_path, content):
+    bot = make_bot(tmp_path, content, datetime(2026, 11, 6, 10, 0, tzinfo=TZ))
+    bot.run()  # drafts 01 (still within 24h) and 02
+    assert bot.state["posts"]["01"]["status"] == "draft_sent"
+    assert bot.state["posts"]["02"]["status"] == "draft_sent"
+    FakeIG.published.clear()
+    bot.now = datetime(2026, 11, 8, 12, 0, tzinfo=TZ)
+    bot.tg._updates = [cb("ok:01"), cb("ok:02")]
+    bot.run()
+    assert FakeIG.published == []  # before 19:00
+    bot.now = datetime(2026, 11, 8, 19, 0, tzinfo=TZ)
+    bot.run()
+    bot.now = datetime(2026, 11, 8, 19, 30, tzinfo=TZ)
+    bot.run()
+    assert len(FakeIG.published) == 1 and bot.state["posts"]["01"]["status"] == "published"
+    bot.now = datetime(2026, 11, 9, 19, 0, tzinfo=TZ)
+    bot.run()
+    assert len(FakeIG.published) == 2 and bot.state["posts"]["02"]["status"] == "published"

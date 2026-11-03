@@ -215,14 +215,26 @@ class Bot:
                  tg_messages=[m["message_id"] for m in album] + [msg["message_id"]])
 
     # ---------- publishing ----------
+    def published_today(self) -> bool:
+        today = self.now.date()
+        return any(s.get("published_at") and datetime.fromisoformat(s["published_at"]).astimezone(self.tz).date() == today
+                   for s in self.state["posts"].values())
+
     def publish_due(self):
+        # At most one post a day, never before the daily publish time. Posts approved
+        # late wait for the next free day instead of going out together.
+        if self.published_today():
+            return
+        slot = self.publish_at({"date": self.now.date().isoformat()})
         for p in self.plan["posts"]:
             s = self.st(p["id"])
-            if s["status"] == "approved" and self.now >= self.publish_at(p):
+            if s["status"] == "approved" and self.now >= self.publish_at(p) and self.now >= slot:
                 try:
                     self.publish(p)
+                    return
                 except Exception as e:
                     self.fail(p["id"], "Instagram'ga joylash", e)
+                    return
 
     def publish(self, p: dict):
         pid = p["id"]
