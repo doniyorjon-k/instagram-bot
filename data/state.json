@@ -72,6 +72,62 @@
     "15": {
       "status": null,
       "attempts": 0
+    },
+    "R01": {
+      "status": null,
+      "attempts": 0
+    },
+    "R02": {
+      "status": null,
+      "attempts": 0
+    },
+    "R03": {
+      "status": null,
+      "attempts": 0
+    },
+    "R04": {
+      "status": null,
+      "attempts": 0
+    },
+    "R05": {
+      "status": null,
+      "attempts": 0
+    },
+    "R06": {
+      "status": null,
+      "attempts": 0
+    },
+    "R07": {
+      "status": null,
+      "attempts": 0
+    },
+    "R08": {
+      "status": null,
+      "attempts": 0
+    },
+    "R09": {
+      "status": null,
+      "attempts": 0
+    },
+    "R10": {
+      "status": null,
+      "attempts": 0
+    },
+    "R11": {
+      "status": null,
+      "attempts": 0
+    },
+    "R12": {
+      "status": null,
+      "attempts": 0
+    },
+    "R13": {
+      "status": null,
+      "attempts": 0
+    },
+    "R14": {
+      "status": null,
+      "attempts": 0
     }
   }
 }
