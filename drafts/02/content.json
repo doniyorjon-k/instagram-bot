@@ -1,0 +1,52 @@
+{
+  "label": "Xaridorlar uchun qo'llanma",
+  "cover": {
+    "line1": "Ot sotib olishdan",
+    "highlight": "oldin buni",
+    "line3": "tekshiring.",
+    "card_bold": "Yaxshi ot tanlash",
+    "card_text": "xatolar va kutilmagan xarajatlarning oldini oladi."
+  },
+  "slides": [
+    {
+      "title": "Oyoq va tuyoqlar",
+      "body": "Tuyoqda yoriqlar va shamollash belgilari yo'qligiga ishonch hosil qiling. Oyoq bo'g'imlarida shish yoki og'riq bo'lmasligi kerak."
+    },
+    {
+      "title": "Tish va yosh",
+      "body": "Otning yoshini va tishlarining yemirilish darajasini tekshiring. Yaxshi tishlar oziqni to'g'ri hazm qilish uchun juda muhimdir."
+    },
+    {
+      "title": "Nafas va yurak urishi",
+      "body": "Harakatdan so'ng nafas olishi tezda joyiga tushishini kuzating. Yo'tal yoki xirillash nafas yo'llari kasalligidan darak beradi."
+    },
+    {
+      "title": "Xulq-atvor va muomala",
+      "body": "Otning odamga va boshqa jonli narsalarga munosabatini sinang. Tajovuzkor yoki o'ta qo'rqoq otlar parvarishda qiyinchilik tug'diradi."
+    },
+    {
+      "title": "Sinab minish va hujjat",
+      "body": "Otni o'zingiz minib ko'rib, egar ostidagi harakatini baholang. Shuningdek, veterinariya va naslchilik hujjatlarini to'liq ko'zdan kechiring."
+    }
+  ],
+  "cta": {
+    "title": "Sog'lom otlarni qidiryapsizmi?",
+    "body": "Telegram botimizda saralangan e'lonlarni ko'ring va sotuvchilar bilan to'g'ridan-to'g'ri bog'laning."
+  },
+  "caption": "Ot sotib olish mas'uliyatli va sinchkovlikni talab qiladigan jarayondir. Tushunmovchiliklar va kutilmagan xarajatlarning oldini olish uchun xarid qilishdan avval otni har tomonlama tekshirib chiqish lozim.\n\nBirinchidan, tuyoq va oyoqlar holatiga alohida e'tibor bering. Tuyoqdagi yoriqlar va bo'g'imlardagi shishlar kelajakda otning harakatiga salbiy ta'sir ko'rsatadi. Ikkinchidan, tishlarning yemirilish darajasi otning yoshini va oziqlanish imkoniyatini ko'rsatadi.\n\nUchinchidan, otni biroz yugurtirib ko'rgach, nafas olishi va yurak urishini tekshiring. Nafas yo'llaridagi xirillash yoki surunkali yo'tal sog'liqda muammo borligini bildiradi. To'rtinchidan, otning xulq-atvorini kuzating. Odamga tez ko'nikadigan va muomalada tinch otlar bilan ishlash osonroq kechadi.\n\nBeshinchidan, otni o'zingiz minib ko'rib, egar ostidagi harakatini his qiling. Oltinchidan, zotdor ot sotib olayotgan bo'lsangiz, uning veterinariya ma'lumotnomasi va naslchilik hujjatlari to'liqligini tekshirishni unutmang. Ot sog'lig'ida jiddiy shubha tug'ilsa, albatta veterinariya mutaxassisiga murojaat qiling.",
+  "hashtags": [
+    "#otbozor",
+    "#otlar",
+    "#kopkari",
+    "#otsotibolish",
+    "#otparvarishi",
+    "#otlarhaqida",
+    "#chavandoz",
+    "#nasldorotlar"
+  ],
+  "sources": [
+    "https://aaep.org/horse-owners/buying-a-horse",
+    "https://extension.umn.edu/horse-care/evaluating-horse-conformation"
+  ],
+  "full_caption": "Ot sotib olish mas'uliyatli va sinchkovlikni talab qiladigan jarayondir. Tushunmovchiliklar va kutilmagan xarajatlarning oldini olish uchun xarid qilishdan avval otni har tomonlama tekshirib chiqish lozim.\n\nBirinchidan, tuyoq va oyoqlar holatiga alohida e'tibor bering. Tuyoqdagi yoriqlar va bo'g'imlardagi shishlar kelajakda otning harakatiga salbiy ta'sir ko'rsatadi. Ikkinchidan, tishlarning yemirilish darajasi otning yoshini va oziqlanish imkoniyatini ko'rsatadi.\n\nUchinchidan, otni biroz yugurtirib ko'rgach, nafas olishi va yurak urishini tekshiring. Nafas yo'llaridagi xirillash yoki surunkali yo'tal sog'liqda muammo borligini bildiradi. To'rtinchidan, otning xulq-atvorini kuzating. Odamga tez ko'nikadigan va muomalada tinch otlar bilan ishlash osonroq kechadi.\n\nBeshinchidan, otni o'zingiz minib ko'rib, egar ostidagi harakatini his qiling. Oltinchidan, zotdor ot sotib olayotgan bo'lsangiz, uning veterinariya ma'lumotnomasi va naslchilik hujjatlari to'liqligini tekshirishni unutmang. Ot sog'lig'ida jiddiy shubha tug'ilsa, albatta veterinariya mutaxassisiga murojaat qiling.\n\nYangi e'lonlar va maslahatlar Telegram botimizda: @otbozor_bot\nSaytimiz: otbozor.uz\n\n#otbozor #otlar #kopkari #otsotibolish #otparvarishi #otlarhaqida #chavandoz #nasldorotlar"
+}
