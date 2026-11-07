@@ -98,8 +98,15 @@
       ]
     },
     "R02": {
-      "status": null,
-      "attempts": 0
+      "status": "draft_sent",
+      "attempts": 0,
+      "feedback": null,
+      "last_error": null,
+      "drafted_at": "2026-11-07T14:21:11.898454+05:00",
+      "tg_messages": [
+        23,
+        24
+      ]
     },
     "R03": {
       "status": null,
