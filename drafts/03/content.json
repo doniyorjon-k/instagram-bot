@@ -1,0 +1,49 @@
+{
+  "label": "Parvarish bo'yicha maslahatlar",
+  "cover": {
+    "line1": "Otni sovuq kunlarga",
+    "highlight": "tayyorlashning",
+    "line3": "muhim qoidalari",
+    "card_bold": "Mavsumiy parvarish",
+    "card_text": "Qishda ot salomatligi va quvvatini saqlash usullari"
+  },
+  "slides": [
+    {
+      "title": "Ozuqa ratsionini oshirish",
+      "body": "Sovuqda ot tana haroratini ushlash uchun ko'proq energiya sarflaydi. Ratsionda samon va pichan ulushini ko'paytirish hazm qilish orqali tana qizishiga yordam beradi."
+    },
+    {
+      "title": "Suv harorati va miqdori",
+      "body": "Muzdek suv otda sanchiq xavfini oshiradi va suv iste'molini kamaytiradi. Suv harorati 10-15 daraja atrofida bo'lishi va muzlamasligi ta'minlanishi zarur."
+    },
+    {
+      "title": "Otxona shamollatishi",
+      "body": "Otxonada zax va dim havo to'planmasligi kerak. Toza havo aylanib turishi nafas yo'llari kasalliklarining oldini oladi, lekin kuchli shamol tushmasligi lozim."
+    },
+    {
+      "title": "Tuyoq va teri parvarishi",
+      "body": "Namlik oshishi tuyoq yumshashi va chirishiga olib kelishi mumkin. Tuyoqlarni har kuni tozalab turish va taglik namligini nazorat qilish shart."
+    }
+  ],
+  "cta": {
+    "title": "Foydali bilimlar Telegram botda",
+    "body": "Ot parvarishi va boqish bo'yicha batafsil maqolalarni saytimizda o'qing."
+  },
+  "caption": "Qish mevsumida otlarni to'g me'yorda saqlash alohida e'tibor talab qiladi. Havo harorati pasayishi bilan otning energiyaga bo'lgan ehtiyoji ortadi.\n\nBirinchidan, ozuqa me'yorini qayta ko'rib chiqing. Poxol va pichan hazm bo'lish jarayonida tana ichidan issiqlik ajratib chiqaradi. Shuning uchun qishda darmonli pichan miqdorini oshirish tavsiya etiladi.\n\nIkkinchidan, suvning muzlamasligiga e'tibor bering. Juda sovuq suvni ot kam ichadi, bu esa hazm qilish tizimida og'ir asoratlarni keltirib chiqarishi mumkin. Suv iliq va doimiy bo'lishi muhim.\n\nUchinchidan, otxonadagi havo almashtirish tizimini tekshiring. Shamol to'g'ridan-to'g'ri urmasligi kerak, ammo havo almashinuvi to'xtab qolishi nafas yo'li muammolariga sabab bo'ladi.\n\nTuyoqlarni har kuni botqoq va sovuqdan tozalash lozim. Jiddiy salomatlik muammolari ko'rinsa, albatta shifokor veterinarga murojaat qiling.",
+  "hashtags": [
+    "#otbozor",
+    "#otlar",
+    "#parvarish",
+    "#otxona",
+    "#tuyoq",
+    "#ko'pkari",
+    "#otlarparvarishi",
+    "#samon",
+    "#otchilik"
+  ],
+  "sources": [
+    "https://extension.umn.edu/horse-care/preparing-your-horse-winter",
+    "https://aaep.org/horse-health/winter-care-tips-horses"
+  ],
+  "full_caption": "Qish mevsumida otlarni to'g me'yorda saqlash alohida e'tibor talab qiladi. Havo harorati pasayishi bilan otning energiyaga bo'lgan ehtiyoji ortadi.\n\nBirinchidan, ozuqa me'yorini qayta ko'rib chiqing. Poxol va pichan hazm bo'lish jarayonida tana ichidan issiqlik ajratib chiqaradi. Shuning uchun qishda darmonli pichan miqdorini oshirish tavsiya etiladi.\n\nIkkinchidan, suvning muzlamasligiga e'tibor bering. Juda sovuq suvni ot kam ichadi, bu esa hazm qilish tizimida og'ir asoratlarni keltirib chiqarishi mumkin. Suv iliq va doimiy bo'lishi muhim.\n\nUchinchidan, otxonadagi havo almashtirish tizimini tekshiring. Shamol to'g'ridan-to'g'ri urmasligi kerak, ammo havo almashinuvi to'xtab qolishi nafas yo'li muammolariga sabab bo'ladi.\n\nTuyoqlarni har kuni botqoq va sovuqdan tozalash lozim. Jiddiy salomatlik muammolari ko'rinsa, albatta shifokor veterinarga murojaat qiling.\n\nYangi e'lonlar va maslahatlar Telegram botimizda: @otbozor_bot\nSaytimiz: otbozor.uz\n\n#otbozor #otlar #parvarish #otxona #tuyoq #ko'pkari #otlarparvarishi #samon #otchilik"
+}
