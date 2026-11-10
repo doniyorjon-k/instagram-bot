@@ -51,8 +51,21 @@
       ]
     },
     "04": {
-      "status": null,
-      "attempts": 0
+      "status": "draft_sent",
+      "attempts": 0,
+      "feedback": null,
+      "last_error": null,
+      "drafted_at": "2026-11-10T15:33:55.767108+05:00",
+      "tg_messages": [
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41
+      ]
     },
     "05": {
       "status": null,

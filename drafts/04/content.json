@@ -1,0 +1,52 @@
+{
+  "label": "Foydali qo'llanma",
+  "cover": {
+    "line1": "Otning yoshini",
+    "highlight": "tishidan",
+    "line3": "bilasizmi?",
+    "card_bold": "Tish qarab yoshni aniqlash",
+    "card_text": "Ot savdosida xato qilmaslik uchun asosiy belgilar bilan tanishing."
+  },
+  "slides": [
+    {
+      "title": "Sut tishidan doimiy tishga o'tish",
+      "body": "Otning yoshi tishlarining chiqishi va o'zgarishiga qarab aniqlanadi. Birinchi sut tishlari tug'ilgayoq yoki dastlabki oylardayoq ko'rinadi."
+    },
+    {
+      "title": "2,5 yoshli ot belgilari",
+      "body": "Ikki yarim yoshga kelib markaziy sut kurak tishlari doimiy tishlarga almashadi. Ular kattaroq va oqish tusda bo'ladi."
+    },
+    {
+      "title": "3,5 va 4,5 yoshdagi o'zgarishlar",
+      "body": "Uch yarim yoshda yon kurak tishlar, to'rt yarim yoshda esa chetki kurak tishlar almashib, to'liq tish qatori shakllanadi."
+    },
+    {
+      "title": "Chashka va stakan belgisi",
+      "body": "Doimiy kurak tishlarning yuzasida chuqurchalar mavjud. Vaqt o'tishi bilan emal yeyilib, chashka belgisi asta-sekin yo'qolib boradi."
+    },
+    {
+      "title": "Keksa otlarning tish tuzilishi",
+      "body": "Olti yoshdan oshgan otlarda tishlar sirti tekislanib, qirralari o'zgara boshlaydi. Yosh ulg'aygan sari tishlar uzunroq va qiya ko'rinish oladi."
+    }
+  ],
+  "cta": {
+    "title": "Savollaringiz bormi?",
+    "body": "Botimizga yozib mutaxassislardan maslahat oling va saytimizda yangi e'lonlarni ko'ring."
+  },
+  "caption": "Ot sotib olishda uning yoshini aniq bilish juda muhim hisoblanadi. Chunki narx, parvarish sharti va ishlatish imkoniyati aynan yoshga bog'liq. Tishlar orqali yoshni aniqlash veterinariya amaliyotida eng keng tarqalgan usullardan biridir. Sut tishlari va doimiy tishlarning farqini ajratishni o'rganish orqali siz har qanday otning haqiqiy yoshini taxmin qilishingiz mumkin. Albatta, bu tajriba talab qiladi va murakkab holatlarda tajribali mutaxassis yoki veterinardan yordam so'ragan ma'qul. Ot savdosi va parvarishiga oid boshqa foydali ma'lumotlarni kuzatib boring.",
+  "hashtags": [
+    "#otbozor",
+    "#otlar",
+    "#otparvarishi",
+    "#otboqish",
+    "#otzoti",
+    "#kopkari",
+    "#uloq",
+    "#otkz"
+  ],
+  "sources": [
+    "https://www.petmd.com/horse/how-tell-horses-age-by-teeth",
+    "https://extension.umn.edu/horse-health/determining-age-horse-teeth"
+  ],
+  "full_caption": "Ot sotib olishda uning yoshini aniq bilish juda muhim hisoblanadi. Chunki narx, parvarish sharti va ishlatish imkoniyati aynan yoshga bog'liq. Tishlar orqali yoshni aniqlash veterinariya amaliyotida eng keng tarqalgan usullardan biridir. Sut tishlari va doimiy tishlarning farqini ajratishni o'rganish orqali siz har qanday otning haqiqiy yoshini taxmin qilishingiz mumkin. Albatta, bu tajriba talab qiladi va murakkab holatlarda tajribali mutaxassis yoki veterinardan yordam so'ragan ma'qul. Ot savdosi va parvarishiga oid boshqa foydali ma'lumotlarni kuzatib boring.\n\nYangi e'lonlar va maslahatlar Telegram botimizda: @otbozor_bot\nSaytimiz: otbozor.uz\n\n#otbozor #otlar #otparvarishi #otboqish #otzoti #kopkari #uloq #otkz"
+}
