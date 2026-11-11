@@ -145,8 +145,15 @@
       ]
     },
     "R04": {
-      "status": null,
-      "attempts": 0
+      "status": "draft_sent",
+      "attempts": 0,
+      "feedback": null,
+      "last_error": null,
+      "drafted_at": "2026-11-11T14:56:18.021915+05:00",
+      "tg_messages": [
+        42,
+        43
+      ]
     },
     "R05": {
       "status": null,

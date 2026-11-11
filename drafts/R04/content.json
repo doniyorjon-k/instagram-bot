@@ -1,0 +1,38 @@
+{
+  "title1": "Ot yoshini tishdan",
+  "titlemark": "3 ta xato",
+  "title2": "bilishdagi",
+  "items": [
+    {
+      "bad": "Faqat old tishlar yeyilishiga qarab baho berish",
+      "good": "Yon tomondan tishlar tutashuv burchagiga qarash"
+    },
+    {
+      "bad": "Yaxob va qattiq yem ta'sirini hisobga olmaslik",
+      "good": "Ozuqa turi tish sirtini erta yeyishini inobatga olish"
+    },
+    {
+      "bad": "Tishdagi Galveyn egatini butkul e'tiborsiz qoldirish",
+      "good": "10 yoshdan keyin yuqori kurak tish egatiga qarash"
+    }
+  ],
+  "cta_title": "Batafsil ma'lumot",
+  "cta_body": "Ot haqida foydali qo'llanmalar va e'lonlar bizning Telegram botda: @otbozor_bot",
+  "caption": "Otning yoshini tishlariga qarab aniqlash qadimdan qo'llanadigan usul, ammo unda adashish ehtimoli yuqori. Birinchidan, tishlarning yeyilishi faqat yoshga emas, balki ot iste'mol qiladigan yem-xashak sifatiga ham bog'liq. Dag'al va qumli ozuqa tishlarni erta yemiradi. Ikkinchidan, yosh kattalashgan sari jag'larning birlashish burchagi o'tkirlashib boradi, buni hisobga olmaslik xatoga olib keladi. Uchinchidan, 10 yoshdan oshgan otlarda yuqori chekka kurak tishda Galveyn egati paydo bo'ladi. Yoshni to'g'ri baholash uchun faqat bitta belgiga tayanmasdan, barcha omillarni birgalikda tekshirish zarur.",
+  "hashtags": [
+    "#otbozor",
+    "#otlar",
+    "#otparvarishi",
+    "#otyoʻshi",
+    "#veterinariya",
+    "#chavandoz",
+    "#kopkari",
+    "#tulpor",
+    "#otishqibozlari"
+  ],
+  "sources": [
+    "AAEP (American Association of Equine Practitioners) - Guide to Determining Age by Teeth",
+    "Veterinary Clinics of North America: Equine Practice - Equine Dentistry"
+  ],
+  "full_caption": "Otning yoshini tishlariga qarab aniqlash qadimdan qo'llanadigan usul, ammo unda adashish ehtimoli yuqori. Birinchidan, tishlarning yeyilishi faqat yoshga emas, balki ot iste'mol qiladigan yem-xashak sifatiga ham bog'liq. Dag'al va qumli ozuqa tishlarni erta yemiradi. Ikkinchidan, yosh kattalashgan sari jag'larning birlashish burchagi o'tkirlashib boradi, buni hisobga olmaslik xatoga olib keladi. Uchinchidan, 10 yoshdan oshgan otlarda yuqori chekka kurak tishda Galveyn egati paydo bo'ladi. Yoshni to'g'ri baholash uchun faqat bitta belgiga tayanmasdan, barcha omillarni birgalikda tekshirish zarur.\n\nYangi e'lonlar va maslahatlar Telegram botimizda: @otbozor_bot\nSaytimiz: otbozor.uz\n\n#otbozor #otlar #otparvarishi #otyoʻshi #veterinariya #chavandoz #kopkari #tulpor #otishqibozlari"
+}
