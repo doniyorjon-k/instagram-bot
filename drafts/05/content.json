@@ -1,0 +1,50 @@
+{
+  "label": "Milliy ot zotlari",
+  "cover": {
+    "line1": "Milliy faxrimiz",
+    "highlight": "Qorabayir zoti",
+    "line3": "haqida bilasizmi",
+    "card_bold": "Chidamli va baquvvat",
+    "card_text": "O'zbekistonning tog'li va dasht hududlarida yetishtirilgan milliy zot."
+  },
+  "slides": [
+    {
+      "title": "Zotning kelib chiqishi",
+      "body": "Qorabayir O'zbekiston hududida asrlar davomida mahalliy otlarni arab va turkman zotlari bilan chatishtirish orqali yetishtirilgan qadimiy milliy zotdir."
+    },
+    {
+      "title": "Asosiy xususiyatlari",
+      "body": "Ushbu zot issiq va sovuq iqlimga, uzoq yo'l yurishga va tog'li yo'llarga juda moslashuvchan. Gavdasi mustahkam, tuyoqlari qattiq va chidamli bo'ladi."
+    },
+    {
+      "title": "Foydalanish sohalari",
+      "body": "Qorabayir otlari milliy sport o'yini bo meyoriy ko'pkarida, minishda, yuk tashishda hamda poygalarda keng qo'llaniladi."
+    },
+    {
+      "title": "Uch xil ko'rinishi",
+      "body": "Zot ichida miniladigan, minib-yuk tortadigan va yuk tortuvchi turlari ajratiladi. Har bir tur o'zining gavda tuzilishi bilan ajralib turadi."
+    }
+  ],
+  "cta": {
+    "title": "Qorabayir otlarini toping",
+    "body": "E'lonlar bazasidan o'zingizga maqbul Qorabayir zotli otlarni izlang."
+  },
+  "caption": "Qorabayir — O'zbekistonning tog'li va dasht hududlarida yetishtirilgan eng mashhur milliy ot zotlaridan biridir. Ushbu zot asrlar davomida mahalliy otlarni arab hamda turkman otlari bilan chatishtirish va tanlash natijasida shakllangan.\n\nQorabayir otlari o'zining chidamliligi, pishiq tuyoqlari va har qanday iqlim sharoitiga tez moslashishi bilan ajralib turadi. Ular ayniqsa ko'pkari musobaqalarida, uzoq masofali minishlarda va xo'jalik ishlarida juda qadrlanadi.\n\nZot standarti bo'yicha Qorabayir otlari uchta asosiy tipga bo'linadi: miniladigan, minib-yuk tortadigan va sof yuk tortuvchi tiplar. Bu ularning turli sohalarda samarali foydalanilishini ta'minlaydi.\n\nAgar siz ham xo'jaligingiz yoki sport uchun chidamli ot izlayotgan bo'lsangiz, Qorabayir zoti eng maqbul tanlovlardan biridir.",
+  "hashtags": [
+    "#otbozor",
+    "#qorabayir",
+    "#otlar",
+    "#kopkari",
+    "#otparvarishi",
+    "#uzbekistan",
+    "#otlarhaqida",
+    "#milliyzotlar",
+    "#otbozoruz",
+    "#zotliotlar"
+  ],
+  "sources": [
+    "https://faolex.fao.org/docs/pdf/uzb198888.pdf",
+    "http://www.fao.org/dad-is"
+  ],
+  "full_caption": "Qorabayir — O'zbekistonning tog'li va dasht hududlarida yetishtirilgan eng mashhur milliy ot zotlaridan biridir. Ushbu zot asrlar davomida mahalliy otlarni arab hamda turkman otlari bilan chatishtirish va tanlash natijasida shakllangan.\n\nQorabayir otlari o'zining chidamliligi, pishiq tuyoqlari va har qanday iqlim sharoitiga tez moslashishi bilan ajralib turadi. Ular ayniqsa ko'pkari musobaqalarida, uzoq masofali minishlarda va xo'jalik ishlarida juda qadrlanadi.\n\nZot standarti bo'yicha Qorabayir otlari uchta asosiy tipga bo'linadi: miniladigan, minib-yuk tortadigan va sof yuk tortuvchi tiplar. Bu ularning turli sohalarda samarali foydalanilishini ta'minlaydi.\n\nAgar siz ham xo'jaligingiz yoki sport uchun chidamli ot izlayotgan bo'lsangiz, Qorabayir zoti eng maqbul tanlovlardan biridir.\n\nYangi e'lonlar va maslahatlar Telegram botimizda: @otbozor_bot\nSaytimiz: otbozor.uz\n\n#otbozor #qorabayir #otlar #kopkari #otparvarishi #uzbekistan #otlarhaqida #milliyzotlar #otbozoruz #zotliotlar"
+}

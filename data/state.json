@@ -68,8 +68,20 @@
       ]
     },
     "05": {
-      "status": null,
-      "attempts": 0
+      "status": "draft_sent",
+      "attempts": 0,
+      "feedback": null,
+      "last_error": null,
+      "drafted_at": "2026-11-12T15:25:14.758507+05:00",
+      "tg_messages": [
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50
+      ]
     },
     "06": {
       "status": null,
