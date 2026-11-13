@@ -168,8 +168,15 @@
       ]
     },
     "R05": {
-      "status": null,
-      "attempts": 0
+      "status": "draft_sent",
+      "attempts": 0,
+      "feedback": null,
+      "last_error": null,
+      "drafted_at": "2026-11-13T15:11:02.691248+05:00",
+      "tg_messages": [
+        51,
+        52
+      ]
     },
     "R06": {
       "status": null,
