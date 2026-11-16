@@ -1,5 +1,5 @@
 {
-  "tg_offset": 904885759,
+  "tg_offset": 904885760,
   "posts": {
     "01": {
       "status": "draft_sent",
@@ -85,13 +85,13 @@
     },
     "06": {
       "status": "regen",
-      "attempts": 2,
+      "attempts": 1,
       "last_error": "matn/rasm: 402 RESOURCE_EXHAUSTED. {'error': {'code': 402, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}",
       "feedback": null
     },
     "07": {
       "status": null,
-      "attempts": 1,
+      "attempts": 2,
       "last_error": "matn/rasm: 402 RESOURCE_EXHAUSTED. {'error': {'code': 402, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}"
     },
     "08": {
