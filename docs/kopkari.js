@@ -6,6 +6,9 @@ export function createKopkari(d) {
   const R = 42, GOAL = new THREE.Vector3(C.x, 0, C.z - 26), GOAL_R = 4.2, MATCH = 90;
   const NAMES = ['Botir', 'Sardor', 'Jasur', 'Oybek', 'Murod'];
   const COLS = [0xef4444, 0x2563eb, 0xf59e0b, 0x9333ea, 0x0ea5e9];
+  // seeded RNG so a friend challenge replays the same rivals
+  const mulberry = (a) => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  let rnd = Math.random, seedV = 0, lvl = 0, ch = null;
 
   /* ---------- arena ---------- */
   const arena = new THREE.Group(); arena.position.copy(C); scene.add(arena); arena.visible = false;
@@ -77,7 +80,7 @@ export function createKopkari(d) {
       const a = (i / 6) * Math.PI * 2 + Math.PI / 2;
       const rad = isMe ? 12 : 19;
       const r = { mesh, name, col, me: isMe, x: Math.cos(a) * rad, z: Math.sin(a) * rad, hd: Math.atan2(Math.cos(a), Math.sin(a)), v: 0, score: 0, stun: isMe ? 0 : 1.0, cool: 0,
-        top: isMe ? 12.4 + H.speed * 0.2 : 9.9 + Math.random() * 0.9 + Math.min(10, store.get('wins', 0)) * 0.06, role: i % 3, seed: Math.random() * 9 };
+        top: isMe ? 12.4 + H.speed * 0.2 : 9.9 + rnd() * 0.9 + lvl * 0.06, role: i % 3, seed: rnd() * 9 };
       riders.push(r); return r;
     };
     me = add({ coat: H.coat, mane: H.mane, silk: S.c, cap: S.cap, num: 1, blaze: H.blaze }, 'Siz', S.c, true, 0);
@@ -86,7 +89,11 @@ export function createKopkari(d) {
 
   function resetUloq() { carrier = null; uloqPos.set(0, 0.3, 0); uloqDrop = 1; }
 
-  function start() {
+  function start(opts = {}) {
+    ch = opts.target != null ? opts : null;
+    seedV = ch ? ch.seed : Math.floor(Math.random() * 36 ** 5);
+    lvl = ch ? ch.lvl : Math.min(10, store.get('wins', 0));
+    rnd = mulberry(seedV + 7919);
     d.setMode('kop'); d.applyTheme('dala', false);
     build(); resetUloq();
     t = MATCH; active = true; done = false; tug = null; tugWins = 0; respawnT = 0; dashT = 0; dashCool = 0;
@@ -94,7 +101,8 @@ export function createKopkari(d) {
     arena.visible = true;
     hide($('menu')); hide($('result')); hide($('hud')); show($('khud')); hide($('tug'));
     $('khint').style.opacity = 1; setTimeout(() => { $('khint').style.opacity = 0; }, 4500);
-    banner("🐐 Ko'pkari! Uloqni olib, qozonga tashlang", 2.6);
+    banner(ch ? `🐐 ${ch.name}: ${ch.target} ta halol. Undan ko'p qiling!` : "🐐 Ko'pkari! Uloqni olib, qozonga tashlang", 2.6);
+    $('kbestl').textContent = ch ? `${ch.name.slice(0, 12)} natijasi` : "Raqiblar eng ko'pi";
     Audio.beep(true); Audio.cheer(true); haptic('impact', 'heavy');
     hud();
   }
@@ -105,7 +113,7 @@ export function createKopkari(d) {
 
   function hud() {
     $('kscore').textContent = me.score;
-    $('kbest').textContent = Math.max(...riders.filter((r) => !r.me).map((r) => r.score));
+    $('kbest').textContent = ch ? ch.target : Math.max(...riders.filter((r) => !r.me).map((r) => r.score));
     const s = Math.max(0, Math.ceil(t)); $('ktime').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
   }
 
@@ -131,12 +139,12 @@ export function createKopkari(d) {
     a.cool = b.cool = 2.5;
     if (b.me && !a.me) a.cool = 3.5;
     if (!a.me && !b.me) {
-      const win = Math.random() < 0.45 ? a : b;
+      const win = rnd() < 0.45 ? a : b;
       if (win === a) { carrier = a; b.stun = 1.0; }
       else a.stun = 0.8;
       return;
     }
-    tug = { a, b, time: 2.0, taps: 0, need: 4 + Math.floor(Math.random() * 3) + Math.min(3, Math.floor(store.get('wins', 0) / 5)) };
+    tug = { a, b, time: 2.0, taps: 0, need: 4 + Math.floor(rnd() * 3) + Math.min(3, Math.floor(lvl / 5)) };
     show($('tug')); $('tugt').textContent = b.me ? `${a.name} uloqni tortyapti! Tez-tez bosing!` : `${b.name} bilan tortishuv! Tez-tez bosing!`;
     haptic('notify', 'warning'); Audio.whoosh();
   }
@@ -259,15 +267,20 @@ export function createKopkari(d) {
     Audio.cheer(false);
     const order = riders.slice().sort((a, b) => b.score - a.score || (a.me ? -1 : 1));
     const place = order.indexOf(me) + 1;
-    const earn = me.score * 40 + tugWins * 10 + (place === 1 ? 100 : 0);
+    let earn = me.score * 40 + tugWins * 10 + (place === 1 ? 100 : 0), chLine = '';
+    if (ch) {
+      if (me.score > ch.target) { earn += 50; chLine = `👥 ${ch.name}ni yutdingiz! ${me.score} : ${ch.target}`; }
+      else if (me.score === ch.target) chLine = `👥 ${ch.name} bilan durang: ${me.score} : ${ch.target}`;
+      else chLine = `👥 ${ch.name} yutdi: ${ch.target} : ${me.score}. Qayta urinib ko'ring!`;
+    }
     addCoins(earn);
     const best = store.get('kopBest', 0); if (me.score > best) store.set('kopBest', me.score);
     if (place === 1) { store.set('wins', store.get('wins', 0) + 1); Audio.fanfare(); }
     d.submitScore('kopkari', me.score);
-    d.setResult({ kop: true, place, score: me.score });
+    d.setResult({ kop: true, place, score: me.score, seed: seedV, lvl, ch });
     show($('result'));
     $('rplace').innerHTML = `${place}<sup>-o'rin</sup>`;
-    $('rsub').textContent = place === 1 ? "Ko'pkari g'olibi! 🏆" : me.score ? 'Yaxshi kurash!' : "Keyingi safar uloq sizniki bo'ladi";
+    $('rsub').textContent = chLine || (place === 1 ? "Ko'pkari g'olibi! 🏆" : me.score ? 'Yaxshi kurash!' : "Keyingi safar uloq sizniki bo'ladi");
     const stars = place === 1 ? 3 : place <= 3 ? 2 : me.score ? 1 : 0;
     $('stars').textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
     $('rtime').textContent = me.score; $('rtime').previousSibling.textContent = 'HALOL';

@@ -721,6 +721,19 @@ function startParam() {
   const m = /[?&](?:tgWebAppStartParam|startapp|c)=([\w-]+)/.exec(location.search); return m ? m[1] : '';
 }
 let challenge = decodeChallenge(startParam());
+// ko'pkari challenge: k1 + seed(5) + score(2) + level(1) + _ + name
+function encodeKop(r) {
+  const p = 'k1' + B36(r.seed, 5) + B36(r.score, 2) + Math.min(35, r.lvl).toString(36);
+  let nm = b64u(myName());
+  while (p.length + 1 + nm.length > 64 && nm.length) nm = nm.slice(0, -4);
+  return nm ? p + '_' + nm : p;
+}
+function decodeKop(p) {
+  if (!p || !/^k1[0-9a-z]{8}(_[\w-]*)?$/.test(p)) return null;
+  const name = p[10] === '_' ? unb64u(p.slice(11)) : '';
+  return { seed: parseInt(p.substr(2, 5), 36), target: parseInt(p.substr(7, 2), 36), lvl: Math.min(10, parseInt(p[9], 36)), name: (name || "Do'stingiz").slice(0, 20) };
+}
+let kopChallenge = decodeKop(startParam());
 function makeGhost(c) {
   const H = HORSES[c.horse];
   const mesh = makeHorse({ coat: H.coat, mane: H.mane, silk: 0x94a3b8, cap: 0xffffff, num: 2, ghost: true });
@@ -794,6 +807,11 @@ function renderMenu() {
     $('invtitle').textContent = `👻 ${challenge.name} sizni bellashuvga chaqirdi!`;
     $('invsub').textContent = `Natijasi: ${challenge.time.toFixed(2)} s · ${THEMES[challenge.theme].name}${challenge.hurdles ? ", to'siqli" : ''}`;
   } else hide($('invite'));
+  if (kopChallenge) {
+    show($('kinvite'));
+    $('kinvtitle').textContent = `🐐 ${kopChallenge.name} sizni ko'pkariga chaqirdi!`;
+    $('kinvsub').textContent = `Natijasi: ${kopChallenge.target} ta halol. Xuddi shu raqiblar bilan undan ko'p qiling`;
+  } else hide($('kinvite'));
 }
 function pick(d) {
   sel = (sel + d + HORSES.length) % HORSES.length; store.set('horse', sel);
@@ -828,8 +846,8 @@ $('invgo').onclick = () => {
 $('share').onclick = () => {
   const r = lastResult; if (!r) return;
   if (r.kop) {
-    const text = `Otbozor ko'pkarisida ${r.score} ta uloqni qozonga tashladim va ${r.place}-o'rinni oldim! Sen ham kel 🐎`;
-    return openTg(`https://t.me/share/url?url=${encodeURIComponent(GAME_URL)}&text=${encodeURIComponent(text)}`);
+    const text = `Otbozor ko'pkarisida ${r.score} ta uloqni qozonga tashladim! Xuddi shu raqiblar bilan mendan ko'p qila olasanmi? 🐐`;
+    return openTg(`https://t.me/share/url?url=${encodeURIComponent(GAME_URL + '?startapp=' + encodeKop(r))}&text=${encodeURIComponent(text)}`);
   }
   if (!r.splits) return;
   const param = encodeChallenge(r);
@@ -1428,8 +1446,13 @@ $('bfriend').onclick = () => {
   openSheet("Do'st bilan bellashuv", `
     <div class="daily"><h4>👻 Arvoh otga qarshi poyga</h4><p>Do'stingiz sizning natijangizga qarshi chopadi: ekranda sizning shaffof "arvoh" otingiz aynan siz yugurgandek yuguradi.</p></div>
     <div class="note"><b>1.</b> Oddiy poyga o'ynang.<br><b>2.</b> Natija oynasida <b>👥 Bellashuv</b> tugmasini bosing.<br><b>3.</b> Do'stingizni tanlab yuboring.<br><b>4.</b> U havolani ochsa, sizning otingizga qarshi poyga boshlanadi. Arvohni yutgan +50 🪙 oladi.</div>
+    <div class="note" style="margin-top:10px"><b>🐐 Ko'pkarida ham:</b> o'yin oxirida <b>👥 Bellashuv</b>ni bosing. Do'stingiz xuddi shu raqiblar bilan o'ynaydi va sizdan ko'p halol qilishga urinadi.</div>
     <button class="btn" id="fgo" style="margin-top:12px">Poygaga o'tish</button>`, (root) => { root.querySelector('#fgo').onclick = () => { hide(ui.sheet); goto('menu'); }; });
 };
+function startKop(opts) {
+  hide($('modes')); screenName = 'kop'; syncBack(); if (!isOwned(sel)) { sel = 0; buildPlayer(); } Kop.start(opts);
+}
+$('kinvgo').onclick = () => { Audio.init(); haptic('impact', 'medium'); const c = kopChallenge; if (!c) return; kopChallenge = null; startKop(c); };
 $('bkop').onclick = () => {
   Audio.init();
   openSheet("Ko'pkari", `
@@ -1440,7 +1463,7 @@ $('bkop').onclick = () => {
     <b>Tortishuv:</b> raqib yaqinlashsa, ekranni tez-tez bosing.<br>
     <b>Sariq o'q</b> qayerga borishni ko'rsatadi, <b>⚡ Tezlash</b> tugmasi raqibga yetib olishga yordam beradi.</div>
     <button class="btn" id="kgo" style="margin-top:12px">Ko'pkarini boshlash</button>`, (root) => {
-    root.querySelector('#kgo').onclick = () => { hide(ui.sheet); hide($('modes')); screenName = 'kop'; syncBack(); if (!isOwned(sel)) { sel = 0; buildPlayer(); } Kop.start(); };
+    root.querySelector('#kgo').onclick = () => { hide(ui.sheet); startKop(); };
   });
 };
 
