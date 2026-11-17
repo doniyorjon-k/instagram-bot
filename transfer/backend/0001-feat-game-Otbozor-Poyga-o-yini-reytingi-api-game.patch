@@ -1,4 +1,4 @@
-From 52575fbff9b0c2d4718deed6537d097408efb99a Mon Sep 17 00:00:00 2001
+From dd44a7fc219d2addb26d846c0c8f1f49f55c2685 Mon Sep 17 00:00:00 2001
 From: Claude <noreply@anthropic.com>
 Date: Tue, 17 Nov 2026 13:35:51 +0000
 Subject: [PATCH] feat(game): Otbozor Poyga o'yini reytingi (/api/game)
@@ -16,13 +16,11 @@ Claude-Session: https://claude.ai/code/session_01PPBaAdNy792st7J3AjM3sP
  src/game/game.controller.ts                   | 51 ++++++++++
  src/game/game.module.ts                       |  9 ++
  src/game/game.service.ts                      | 93 +++++++++++++++++++
- src/game/zz-serve.ts                          | 10 ++
- 8 files changed, 204 insertions(+)
+ 7 files changed, 194 insertions(+)
  create mode 100644 prisma/migrations/20261117120000_game_scores/migration.sql
  create mode 100644 src/game/game.controller.ts
  create mode 100644 src/game/game.module.ts
  create mode 100644 src/game/game.service.ts
- create mode 100644 src/game/zz-serve.ts
 
 diff --git a/.env.example b/.env.example
 index 42138e3..742124a 100644
@@ -277,22 +275,6 @@ index 0000000..c4f064a
 +        };
 +    }
 +}
-diff --git a/src/game/zz-serve.ts b/src/game/zz-serve.ts
-new file mode 100644
-index 0000000..4ee1468
---- /dev/null
-+++ b/src/game/zz-serve.ts
-@@ -0,0 +1,10 @@
-+import { NestFactory } from '@nestjs/core';
-+import { Module, ValidationPipe } from '@nestjs/common';
-+import { ConfigModule } from '@nestjs/config';
-+import { PrismaModule } from '../prisma/prisma.module';
-+import { GameModule } from './game.module';
-+@Module({ imports: [ConfigModule.forRoot({ isGlobal: true, ignoreEnvFile: true }), PrismaModule, GameModule] })
-+class M {}
-+(async () => { const app = await NestFactory.create(M, { logger: false });
-+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true, transformOptions: { enableImplicitConversion: true } }));
-+  app.setGlobalPrefix('api'); await app.listen(5099); console.log('up'); })();
 -- 
 2.43.0
 
