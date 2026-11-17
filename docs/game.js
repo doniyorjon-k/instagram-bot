@@ -1437,7 +1437,8 @@ $('bkop').onclick = () => {
     <div class="note"><b>Boshqarish:</b> barmog'ingizni ekranga qo'yib, kerakli tomonga suring.<br>
     <b>Uloq:</b> o'rtadagi sariq halqaga yetib boring, uloq o'zi qo'lingizga o'tadi.<br>
     <b>Halol:</b> uloqni yashil "Qozon" aylanasiga olib kiring.<br>
-    <b>Tortishuv:</b> raqib yaqinlashsa, ekranni tez-tez bosing.</div>
+    <b>Tortishuv:</b> raqib yaqinlashsa, ekranni tez-tez bosing.<br>
+    <b>Sariq o'q</b> qayerga borishni ko'rsatadi, <b>⚡ Tezlash</b> tugmasi raqibga yetib olishga yordam beradi.</div>
     <button class="btn" id="kgo" style="margin-top:12px">Ko'pkarini boshlash</button>`, (root) => {
     root.querySelector('#kgo').onclick = () => { hide(ui.sheet); hide($('modes')); screenName = 'kop'; syncBack(); if (!isOwned(sel)) { sel = 0; buildPlayer(); } Kop.start(); };
   });

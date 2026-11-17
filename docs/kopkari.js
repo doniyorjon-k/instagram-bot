@@ -54,7 +54,13 @@ export function createKopkari(d) {
 
   /* ---------- state ---------- */
   let riders = [], me = null, carrier = null, uloqPos = new THREE.Vector3(), uloqDrop = 0, t = 0, active = false, done = false;
-  let joy = null, tug = null, respawnT = 0, tugWins = 0;
+  let joy = null, tug = null, respawnT = 0, tugWins = 0, dashT = 0, dashCool = 0;
+  const arrow = new THREE.Mesh(new THREE.ConeGeometry(0.45, 1.2, 3), new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.9 }));
+  arrow.rotation.x = -Math.PI / 2; const arrowG = new THREE.Group(); arrowG.add(arrow); arrow.position.z = -2.6; arena.add(arrowG);
+  function dash() {
+    if (!active || dashCool > 0 || tug) return;
+    dashT = 1.3; dashCool = 5; Audio.whoosh(); haptic('impact', 'heavy'); pop('⚡ Tezlash!', '#f59e0b');
+  }
   const tmp = new THREE.Vector3();
 
   function label(name, col) {
@@ -69,8 +75,9 @@ export function createKopkari(d) {
     const add = (o, name, col, isMe, i) => {
       const mesh = makeHorse(o); mesh.add(label(name, col)); arena.add(mesh);
       const a = (i / 6) * Math.PI * 2 + Math.PI / 2;
-      const r = { mesh, name, col, me: isMe, x: Math.cos(a) * 18, z: Math.sin(a) * 18, hd: Math.atan2(Math.cos(a), Math.sin(a)), v: 0, score: 0, stun: 0, cool: 0,
-        top: isMe ? 10.4 + H.speed * 0.22 : 9.6 + Math.random() * 1.0 + Math.min(9, store.get('wins', 0)) * 0.1, role: i % 3, seed: Math.random() * 9 };
+      const rad = isMe ? 12 : 19;
+      const r = { mesh, name, col, me: isMe, x: Math.cos(a) * rad, z: Math.sin(a) * rad, hd: Math.atan2(Math.cos(a), Math.sin(a)), v: 0, score: 0, stun: isMe ? 0 : 1.0, cool: 0,
+        top: isMe ? 12.4 + H.speed * 0.2 : 9.9 + Math.random() * 0.9 + Math.min(10, store.get('wins', 0)) * 0.06, role: i % 3, seed: Math.random() * 9 };
       riders.push(r); return r;
     };
     me = add({ coat: H.coat, mane: H.mane, silk: S.c, cap: S.cap, num: 1, blaze: H.blaze }, 'Siz', S.c, true, 0);
@@ -82,7 +89,8 @@ export function createKopkari(d) {
   function start() {
     d.setMode('kop'); d.applyTheme('dala', false);
     build(); resetUloq();
-    t = MATCH; active = true; done = false; tug = null; tugWins = 0; respawnT = 0;
+    t = MATCH; active = true; done = false; tug = null; tugWins = 0; respawnT = 0; dashT = 0; dashCool = 0;
+    $('kdash').onclick = dash;
     arena.visible = true;
     hide($('menu')); hide($('result')); hide($('hud')); show($('khud')); hide($('tug'));
     $('khint').style.opacity = 1; setTimeout(() => { $('khint').style.opacity = 0; }, 4500);
@@ -121,13 +129,14 @@ export function createKopkari(d) {
   function startTug(a, b) {
     // a = attacker, b = carrier
     a.cool = b.cool = 2.5;
+    if (b.me && !a.me) a.cool = 3.5;
     if (!a.me && !b.me) {
       const win = Math.random() < 0.45 ? a : b;
       if (win === a) { carrier = a; b.stun = 1.0; }
       else a.stun = 0.8;
       return;
     }
-    tug = { a, b, time: 1.7, taps: 0, need: 7 + Math.floor(Math.random() * 4) + Math.min(5, Math.floor(store.get('wins', 0) / 4)) };
+    tug = { a, b, time: 2.0, taps: 0, need: 4 + Math.floor(Math.random() * 3) + Math.min(3, Math.floor(store.get('wins', 0) / 5)) };
     show($('tug')); $('tugt').textContent = b.me ? `${a.name} uloqni tortyapti! Tez-tez bosing!` : `${b.name} bilan tortishuv! Tez-tez bosing!`;
     haptic('notify', 'warning'); Audio.whoosh();
   }
@@ -137,8 +146,8 @@ export function createKopkari(d) {
     const meIsCarrier = b.me;
     if (playerWon) {
       tugWins++;
-      if (!meIsCarrier) { carrier = me; b.stun = 1.2; pop('Tortib oldingiz!', '#16a34a'); }
-      else { a.stun = 1.2; pop("Uloqni saqladingiz!", '#16a34a'); }
+      if (!meIsCarrier) { carrier = me; b.stun = 2.0; me.cool = 3; pop('Tortib oldingiz!', '#16a34a'); }
+      else { a.stun = 2.2; me.cool = 3; pop("Uloqni saqladingiz!", '#16a34a'); }
       haptic('notify', 'success'); Audio.perfect(3);
     } else {
       if (meIsCarrier) { carrier = a; me.stun = 1.0; pop('Uloqni oldirdingiz', '#ef4444'); }
@@ -150,11 +159,12 @@ export function createKopkari(d) {
 
   /* ---------- AI + movement ---------- */
   function steer(r, tx, tz, want, dt) {
+    const turn = r.me ? 5.5 : 3.0;
     const dx = tx - r.x, dz = tz - r.z, dist = Math.hypot(dx, dz);
     if (dist < 0.3) { r.v += (0 - r.v) * Math.min(1, dt * 2); return; }
     const target = Math.atan2(-dx, -dz);
     let da = target - r.hd; while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
-    r.hd += Math.max(-dt * 3.2, Math.min(dt * 3.2, da));
+    r.hd += Math.max(-dt * turn, Math.min(dt * turn, da));
     const sp = want * (Math.abs(da) > 1.2 ? 0.5 : 1);
     r.v += (sp - r.v) * Math.min(1, dt * 1.8);
   }
@@ -162,6 +172,8 @@ export function createKopkari(d) {
     if (!active) return;
     if (tug) { tug.time -= dt; $('tugb').style.width = Math.min(100, tug.taps / tug.need * 100) + '%'; if (tug.time <= 0) endTug(); }
     else t -= dt;
+    dashT = Math.max(0, dashT - dt); dashCool = Math.max(0, dashCool - dt);
+    const db = $('kdash'); db.style.display = tug ? 'none' : ''; db.disabled = dashCool > 0; db.textContent = dashCool > 0 ? Math.ceil(dashCool) + ' s' : '⚡ Tezlash';
     if (t <= 0 && !done) return finish();
     // uloq drop animation
     if (uloqDrop > 0) uloqDrop = Math.max(0, uloqDrop - dt * 1.5);
@@ -169,7 +181,7 @@ export function createKopkari(d) {
 
     for (const r of riders) {
       r.stun = Math.max(0, r.stun - dt); r.cool = Math.max(0, r.cool - dt);
-      const top = r.top * (carrier === r ? 0.9 : 1);
+      const top = r.top * (carrier === r ? (r.me ? 0.95 : 0.82) : 1) * (r.me && dashT > 0 ? 1.45 : 1);
       if (tug && (tug.a === r || tug.b === r)) { r.v *= 0.9; }
       else if (r.stun > 0) { r.v *= 0.94; }
       else if (r.me) {
@@ -197,7 +209,7 @@ export function createKopkari(d) {
     }
     // grab
     if (!carrier && respawnT <= 0 && uloqDrop < 0.3) {
-      for (const r of riders) if (r.stun <= 0 && Math.hypot(r.x - uloqPos.x, r.z - uloqPos.z) < 1.8) {
+      for (const r of riders) if (r.stun <= 0 && Math.hypot(r.x - uloqPos.x, r.z - uloqPos.z) < (r.me ? 2.8 : 1.7)) {
         carrier = r; r.cool = 1.2;
         if (r.me) { banner("✊ Uloq sizda! Qozonga olib boring", 1.6); haptic('impact', 'heavy'); Audio.whoosh(); }
         else banner(`${r.name} uloqni oldi!`, 1.2);
@@ -206,7 +218,7 @@ export function createKopkari(d) {
     }
     // snatch attempts
     if (carrier && !tug && carrier.cool <= 0) {
-      for (const r of riders) if (r !== carrier && r.stun <= 0 && r.cool <= 0 && Math.hypot(r.x - carrier.x, r.z - carrier.z) < 2.3) { startTug(r, carrier); break; }
+      for (const r of riders) if (r !== carrier && r.stun <= 0 && r.cool <= 0 && Math.hypot(r.x - carrier.x, r.z - carrier.z) < (r.me ? 3.4 : carrier.me ? 1.9 : 2.3)) { startTug(r, carrier); break; }
     }
     // score
     if (carrier && !tug) {
@@ -231,6 +243,14 @@ export function createKopkari(d) {
     halo.visible = !carrier && respawnT <= 0; halo.position.set(uloqPos.x, 0.09, uloqPos.z); halo.scale.setScalar(1 + Math.sin(t * 6) * 0.12);
     fill.material.opacity = carrier && carrier.me ? 0.35 + Math.sin(t * 8) * 0.15 : 0.22;
     flag.rotation.y = Math.sin(t * 5) * 0.3;
+    // guide arrow: to the uloq, to the qozon when carrying, to the carrier otherwise
+    let tx, tz;
+    if (carrier === me) { tx = GOAL.x - C.x; tz = GOAL.z - C.z; arrow.material.color.set(0x22c55e); }
+    else if (carrier) { tx = carrier.x; tz = carrier.z; arrow.material.color.set(0xef4444); }
+    else { tx = uloqPos.x; tz = uloqPos.z; arrow.material.color.set(0xfacc15); }
+    arrowG.visible = respawnT <= 0 && Math.hypot(tx - me.x, tz - me.z) > 4;
+    arrowG.position.set(me.x, 0.15, me.z); arrowG.rotation.y = Math.atan2(-(tx - me.x), -(tz - me.z));
+    arrow.position.z = -2.6 - Math.sin(t * 8) * 0.25;
     hud();
   }
 
@@ -270,5 +290,6 @@ export function createKopkari(d) {
     d.sun.position.set(p.x + 12, 26, p.z + 8); d.sun.target.position.set(p.x, 0, p.z - 2);
   }
 
-  return { start, stop, update, pointer, tap, camera, get active() { return active; } };
+  if (/[?&]debug/.test(location.search)) window.__kop = () => ({ arrow: arrowG.rotation.y, tug: !!tug, carrierMe: carrier === me, score: me && me.score, dashCool });
+  return { start, stop, update, pointer, tap, dash, camera, get active() { return active; } };
 }

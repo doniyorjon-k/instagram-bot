@@ -186,6 +186,9 @@
   .earn{text-align:center;font-weight:900;color:var(--gd);margin:-4px 0 8px;font-size:15px}
   .earn:empty{display:none}
   #khud{justify-content:space-between}
+  .kdash{position:fixed;right:16px;bottom:calc(var(--bot) + 24px);width:96px;height:96px;border-radius:50%;background:var(--gold);color:#fff;font-weight:900;font-size:14px;box-shadow:0 6px 0 #b45309,0 10px 24px rgba(0,0,0,.25)}
+  .kdash:disabled{background:#94a3b8;box-shadow:0 6px 0 #64748b}
+  .kdash:active{transform:translateY(4px)}
   .khint{align-self:center;background:rgba(15,23,42,.8);color:#fff;font-weight:700;font-size:13px;border-radius:999px;padding:8px 14px;text-align:center}
   .tug{align-self:stretch;background:rgba(255,255,255,.96);border-radius:18px;padding:12px;text-align:center}
   .tug .bar{height:14px;margin-top:8px}
@@ -339,6 +342,7 @@
     </div>
   </div>
   <div class="khint" id="khint">Barmog'ingizni ushlab turing: ot o'sha tomonga chopadi</div>
+  <button class="kdash" id="kdash">⚡ Tezlash</button>
   <div class="tug hidden" id="tug"><b id="tugt">Tortishuv! Tez-tez bosing!</b><div class="bar"><i id="tugb"></i></div></div>
 </div>
 <div class="joy hidden" id="joy"><i id="joyk"></i></div>
