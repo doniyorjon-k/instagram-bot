@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>Otbozor Poyga</title>
+<meta name="description" content="Otbozor Poyga: otingizni tanlang, ritmda bosing va marraga birinchi yeting.">
+<link rel="icon" href="logo.png">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root{
+    --g:#16A34A; --gd:#15803D; --gl:#DCFCE7; --ink:#0F172A; --mut:#64748B; --line:#E2E8F0;
+    --gold:#F59E0B; --red:#EF4444;
+    --top: max(env(safe-area-inset-top), var(--tg-content-safe-area-inset-top, 0px));
+    --bot: max(env(safe-area-inset-bottom), var(--tg-content-safe-area-inset-bottom, 0px));
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;background:#eaf6ff;color:var(--ink);
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-user-select:none;user-select:none;touch-action:none;overscroll-behavior:none}
+  #c{position:fixed;inset:0;width:100%;height:100%;display:block}
+  .screen{position:fixed;inset:0;display:flex;flex-direction:column;pointer-events:none;
+    padding:calc(var(--top) + 14px) 16px calc(var(--bot) + 16px)}
+  .hidden{display:none!important}
+  .screen > *{pointer-events:auto}
+  button{font:inherit;border:0;cursor:pointer}
+  .btn{background:var(--g);color:#fff;font-weight:800;font-size:18px;letter-spacing:.2px;
+    border-radius:16px;padding:16px 20px;width:100%;box-shadow:0 6px 0 var(--gd),0 10px 24px rgba(22,163,74,.35);
+    transition:transform .08s, box-shadow .08s}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--gd),0 4px 10px rgba(22,163,74,.3)}
+  .btn.ghost{background:#fff;color:var(--gd);box-shadow:0 4px 0 var(--line),0 8px 18px rgba(15,23,42,.08);border:2px solid var(--line)}
+  .card{background:rgba(255,255,255,.94);border-radius:22px;padding:16px;
+    box-shadow:0 10px 30px rgba(15,23,42,.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+
+  /* MENU */
+  #menu{justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:10px;align-self:flex-start;background:rgba(255,255,255,.92);
+    padding:6px 14px 6px 8px;border-radius:999px;box-shadow:0 4px 14px rgba(15,23,42,.1)}
+  .brand img{height:30px}
+  .brand b{font-size:16px;letter-spacing:.3px}
+  .brand b span{color:var(--g)}
+  .title{margin-top:14px}
+  .title h1{font-size:34px;line-height:1;font-weight:900;letter-spacing:-1px;color:#fff;
+    text-shadow:0 2px 0 var(--gd),0 6px 18px rgba(0,0,0,.25)}
+  .title p{color:#fff;font-weight:600;margin-top:6px;text-shadow:0 1px 8px rgba(0,0,0,.35)}
+  .picker{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .arrow{width:46px;height:46px;border-radius:14px;background:#fff;color:var(--gd);font-size:22px;font-weight:900;
+    box-shadow:0 4px 12px rgba(15,23,42,.12);flex:none}
+  .arrow:active{transform:scale(.94)}
+  .hname{flex:1;text-align:center}
+  .hname h2{font-size:26px;font-weight:900;letter-spacing:-.5px}
+  .hname small{color:var(--mut);font-weight:600}
+  .stat{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:13px;font-weight:700;color:var(--mut)}
+  .stat label{width:96px}
+  .bar{flex:1;height:8px;border-radius:9px;background:var(--line);overflow:hidden}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--g),#22c55e);border-radius:9px;transition:width .35s}
+  .meta{display:flex;justify-content:space-between;margin:12px 2px 12px;font-size:13px;color:var(--mut);font-weight:600}
+  .meta b{color:var(--ink)}
+  .howto{font-size:13px;color:var(--mut);line-height:1.45;margin-bottom:12px;text-align:center}
+  .howto b{color:var(--gd)}
+  .iconbtn{position:absolute;right:16px;top:calc(var(--top) + 14px);width:42px;height:42px;border-radius:50%;
+    background:rgba(255,255,255,.92);font-size:18px;box-shadow:0 4px 14px rgba(15,23,42,.1)}
+
+  /* HUD */
+  #hud{justify-content:space-between}
+  .hudtop{display:flex;gap:10px;align-items:stretch}
+  .pos{background:var(--ink);color:#fff;border-radius:18px;padding:6px 14px;min-width:84px;text-align:center}
+  .pos b{font-size:32px;font-weight:900;line-height:1}
+  .pos b sup{font-size:15px;font-weight:700;opacity:.7}
+  .pos small{display:block;font-size:10px;letter-spacing:1px;opacity:.65;font-weight:700}
+  .track{flex:1;background:rgba(255,255,255,.92);border-radius:18px;padding:10px 12px;display:flex;flex-direction:column;justify-content:center}
+  .trackrow{display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:var(--mut)}
+  .trackrow b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .lane{position:relative;height:16px;margin-top:6px;background:var(--line);border-radius:9px}
+  .lane .fin{position:absolute;right:0;top:-3px;bottom:-3px;width:6px;border-radius:2px;
+    background:repeating-linear-gradient(0deg,#0f172a 0 4px,#fff 4px 8px)}
+  .dot{position:absolute;top:2px;width:12px;height:12px;border-radius:50%;margin-left:-6px;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .dot.me{width:16px;height:16px;top:0;margin-left:-8px;z-index:2;background:var(--g)}
+  .hudbot{display:flex;flex-direction:column;gap:10px}
+  .gauges{display:flex;gap:10px}
+  .gauge{flex:1;background:rgba(255,255,255,.92);border-radius:16px;padding:8px 12px}
+  .gauge .trackrow{font-size:11px}
+  .gauge .bar{height:10px;margin-top:5px}
+  #stam i{background:linear-gradient(90deg,#f59e0b,#22c55e)}
+  #stam.low i{background:var(--red)}
+  .speed b{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums}
+  .rhythm{background:rgba(255,255,255,.95);border-radius:20px;padding:12px 14px 14px}
+  .meter{position:relative;height:34px;border-radius:12px;overflow:hidden;
+    background:linear-gradient(90deg,#fecaca,#fee2e2 25%,#fef3c7 34%,#fef3c7 66%,#fee2e2 75%,#fecaca)}
+  .zone{position:absolute;top:0;bottom:0;border-radius:6px}
+  #zgood{background:#fde68a}
+  #zperf{background:var(--g);box-shadow:0 0 18px rgba(22,163,74,.7)}
+  .needle{position:absolute;top:-4px;bottom:-4px;width:6px;margin-left:-3px;background:var(--ink);border-radius:4px;box-shadow:0 0 0 2px #fff}
+  .tapline{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;font-weight:800;color:var(--mut)}
+  .combo{color:var(--gd);font-size:15px}
+  .pop{position:fixed;left:0;right:0;top:34%;text-align:center;font-size:44px;font-weight:900;pointer-events:none;
+    letter-spacing:-1px;opacity:0}
+  .pop.show{animation:pop .7s ease-out}
+  @keyframes pop{0%{opacity:0;transform:scale(.5)}15%{opacity:1;transform:scale(1.15)}30%{transform:scale(1)}100%{opacity:0;transform:translateY(-40px)}}
+  .count{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;font-weight:900;
+    color:#fff;text-shadow:0 6px 0 var(--gd),0 12px 40px rgba(0,0,0,.35);pointer-events:none}
+  .count.go{color:var(--gold);text-shadow:0 6px 0 #b45309,0 12px 40px rgba(0,0,0,.35)}
+  .banner{position:fixed;left:16px;right:16px;top:calc(var(--top) + 100px);text-align:center;pointer-events:none}
+  .banner span{display:inline-block;background:var(--ink);color:#fff;font-weight:800;padding:8px 16px;border-radius:999px;font-size:14px;
+    opacity:0;transform:translateY(-10px);transition:all .3s}
+  .banner span.on{opacity:1;transform:none}
+  #vign{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .25s;
+    background:radial-gradient(ellipse at center,transparent 55%,rgba(22,163,74,.35) 100%)}
+  #vign.on{opacity:1}
+
+  /* RESULT */
+  #result{justify-content:flex-end;background:linear-gradient(180deg,transparent 20%,rgba(15,23,42,.45))}
+  .place{text-align:center;color:#fff;margin-bottom:auto;padding-top:18px}
+  .place .big{font-size:84px;font-weight:900;line-height:1;text-shadow:0 6px 0 var(--gd),0 12px 30px rgba(0,0,0,.3)}
+  .place .big sup{font-size:34px}
+  .place .sub{font-size:22px;font-weight:800;text-shadow:0 2px 10px rgba(0,0,0,.4)}
+  .stars{font-size:30px;letter-spacing:4px;margin-top:6px}
+  .rows{display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;margin-bottom:10px}
+  .rows div{font-size:11px;color:var(--mut);font-weight:700;letter-spacing:.5px}
+  .rows b{display:block;font-size:20px;color:var(--ink);font-weight:900;font-variant-numeric:tabular-nums}
+  .rows .nb{color:var(--g)}
+  .order{font-size:13px;border-top:1px solid var(--line);padding-top:8px;margin-bottom:12px}
+  .order div{display:flex;align-items:center;gap:8px;padding:3px 0;font-weight:600;color:var(--mut)}
+  .order div.me{color:var(--ink);font-weight:800}
+  .order i{width:10px;height:10px;border-radius:50%}
+  .order span{margin-left:auto;font-variant-numeric:tabular-nums}
+  .btnrow{display:flex;gap:10px}
+  .cta{margin-top:12px;background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;border-radius:20px;padding:14px;display:flex;align-items:center;gap:12px}
+  .cta img{width:46px;height:auto;background:#fff;border-radius:14px;padding:4px}
+  .cta div{flex:1}
+  .cta b{display:block;font-size:14px;line-height:1.25}
+  .cta small{display:block;font-size:11px;opacity:.9;margin-top:2px}
+  .cta button{background:#fff;color:var(--gd);font-weight:800;border-radius:12px;padding:10px;font-size:13px;white-space:nowrap}
+  .site{display:block;text-align:center;margin-top:10px;color:#fff;font-weight:700;font-size:13px;opacity:.9}
+  .tip{position:fixed;left:16px;right:16px;bottom:calc(var(--bot) + 190px);background:rgba(255,255,255,.96);border-radius:18px;padding:12px 14px;
+    font-size:14px;line-height:1.45;color:var(--mut);text-align:center;box-shadow:0 10px 30px rgba(15,23,42,.15);pointer-events:none}
+  .tip b{display:block;color:var(--ink);margin-bottom:2px}
+  .tip span{color:var(--gd);font-weight:800}
+  .topright{position:absolute;right:16px;top:calc(var(--top) + 14px);display:flex;gap:8px;align-items:center}
+  .topright .iconbtn{position:static}
+  .coins{background:rgba(255,255,255,.95);border-radius:999px;padding:9px 12px;font-weight:900;font-size:14px;box-shadow:0 4px 14px rgba(15,23,42,.1)}
+  .real{display:block;text-align:center;font-size:12px;font-weight:700;color:var(--gd);margin-top:8px;text-decoration:none}
+  .chips{display:flex;gap:6px;margin-top:10px;overflow-x:auto;scrollbar-width:none}
+  .chips button{flex:1;white-space:nowrap;background:#f1f5f9;color:var(--mut);font-weight:800;font-size:12px;border-radius:10px;padding:8px 6px}
+  .chips button.on{background:var(--gl);color:var(--gd);box-shadow:inset 0 0 0 2px var(--g)}
+  .modes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+  .modes button{background:#f8fafc;border:1.5px solid var(--line);border-radius:14px;padding:8px 2px;font-weight:800;font-size:12px;color:var(--ink);position:relative}
+  .modes i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}
+  .modes em{position:absolute;top:-6px;right:-4px;background:var(--gold);color:#fff;font-style:normal;font-size:10px;border-radius:999px;padding:2px 6px}
+  .modes em:empty{display:none}
+  .invite{margin-top:12px;background:rgba(15,23,42,.88);color:#fff;border-radius:18px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}
+  .invite small{grid-column:1;opacity:.8;font-size:12px}
+  .invite button{grid-row:1/3;grid-column:2;background:var(--g);color:#fff;font-weight:800;border-radius:12px;padding:10px 12px}
+  .sheetwrap{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:flex-end;z-index:5}
+  .sheet{background:#fff;width:100%;max-height:86%;overflow:auto;border-radius:24px 24px 0 0;padding:16px 16px calc(var(--bot) + 18px);touch-action:pan-y}
+  .sheethead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .sheethead h3{font-size:22px;font-weight:900}
+  .x{width:36px;height:36px;border-radius:50%;background:#f1f5f9;font-size:16px}
+  .item{display:flex;align-items:center;gap:12px;padding:12px;border:1.5px solid var(--line);border-radius:16px;margin-bottom:8px}
+  .item.on{border-color:var(--g);background:var(--gl)}
+  .sw{width:40px;height:40px;border-radius:12px;flex:none;box-shadow:inset 0 0 0 2px rgba(0,0,0,.08)}
+  .item div{flex:1;min-width:0}
+  .item b{display:block;font-size:15px}
+  .item small{color:var(--mut);font-size:12px;font-weight:600}
+  .item button{background:var(--g);color:#fff;font-weight:800;border-radius:12px;padding:9px 12px;font-size:13px;white-space:nowrap}
+  .item button.own{background:#f1f5f9;color:var(--mut)}
+  .item button:disabled{opacity:.45}
+  .sec{font-size:12px;font-weight:800;color:var(--mut);letter-spacing:.6px;margin:14px 2px 8px}
+  .tabs{display:flex;gap:6px;margin-bottom:10px}
+  .tabs button{flex:1;background:#f1f5f9;border-radius:10px;padding:9px;font-weight:800;color:var(--mut)}
+  .tabs button.on{background:var(--ink);color:#fff}
+  .row{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line);font-weight:700}
+  .row .n{width:26px;color:var(--mut)}
+  .row .t{margin-left:auto;font-variant-numeric:tabular-nums}
+  .row.me{background:var(--gl);border-radius:10px}
+  .note{background:#f8fafc;border-radius:14px;padding:12px;font-size:13px;color:var(--mut);line-height:1.5}
+  .note b{color:var(--ink)}
+  .daily{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;border-radius:18px;padding:16px;margin-bottom:12px}
+  .daily h4{font-size:20px;font-weight:900}
+  .daily p{opacity:.92;font-size:13px;margin-top:4px;line-height:1.45}
+  .days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:12px 0}
+  .days div{background:#f1f5f9;border-radius:10px;text-align:center;padding:8px 0;font-size:11px;font-weight:800;color:var(--mut)}
+  .days div.on{background:var(--gold);color:#fff}
+  .days div b{display:block;font-size:13px}
+  .earn{text-align:center;font-weight:900;color:var(--gd);margin:-4px 0 8px;font-size:15px}
+  .earn:empty{display:none}
+  #khud{justify-content:space-between}
+  .kdash{position:fixed;right:16px;bottom:calc(var(--bot) + 24px);width:96px;height:96px;border-radius:50%;background:var(--gold);color:#fff;font-weight:900;font-size:14px;box-shadow:0 6px 0 #b45309,0 10px 24px rgba(0,0,0,.25)}
+  .kdash:disabled{background:#94a3b8;box-shadow:0 6px 0 #64748b}
+  .kdash:active{transform:translateY(4px)}
+  .khint{align-self:center;background:rgba(15,23,42,.8);color:#fff;font-weight:700;font-size:13px;border-radius:999px;padding:8px 14px;text-align:center}
+  .tug{align-self:stretch;background:rgba(255,255,255,.96);border-radius:18px;padding:12px;text-align:center}
+  .tug .bar{height:14px;margin-top:8px}
+  .tug .bar i{background:linear-gradient(90deg,var(--red),var(--gold),var(--g))}
+  .joy{position:fixed;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.7);pointer-events:none;z-index:3}
+  .joy i{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:rgba(22,163,74,.85);box-shadow:0 4px 12px rgba(0,0,0,.25)}
+  .meter.jump{background:linear-gradient(90deg,#e2e8f0,#e2e8f0)}
+  .homebar{display:flex;justify-content:space-between;align-items:center}
+  .topright2{display:flex;gap:8px;align-items:center}
+  .topright2 .iconbtn{position:static}
+  .hero{margin:auto 0;text-align:center;color:#fff}
+  .hero img{width:120px;filter:drop-shadow(0 8px 18px rgba(0,0,0,.35));animation:bob 2.4s ease-in-out infinite}
+  .hero h1{font-size:46px;line-height:.95;font-weight:900;letter-spacing:-1px;text-shadow:0 3px 0 var(--gd),0 10px 30px rgba(0,0,0,.35);margin-top:6px}
+  .hero h1 span{color:#bbf7d0}
+  .hero p{font-weight:700;margin-top:10px;text-shadow:0 2px 10px rgba(0,0,0,.5)}
+  .homebtns{display:flex;flex-direction:column;gap:12px}
+  .btn.big{font-size:22px;padding:20px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .grid2 button{background:rgba(255,255,255,.95);border-radius:16px;padding:14px;font-weight:800;font-size:15px;color:var(--ink);box-shadow:0 6px 18px rgba(15,23,42,.12)}
+  .navbar{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.95);border-radius:18px;padding:8px 10px;box-shadow:0 6px 18px rgba(15,23,42,.1)}
+  .navbar h2{flex:1;font-size:18px;font-weight:900}
+  .back{width:40px;height:40px;border-radius:12px;background:#f1f5f9;font-size:26px;font-weight:900;color:var(--ink);line-height:1;flex:none}
+  .back.sm{width:30px;height:30px;font-size:22px;border-radius:50%;margin-right:-2px}
+  .skip{background:none;color:var(--mut);font-weight:800;font-size:13px;padding:8px}
+  .modelist{display:flex;flex-direction:column;gap:12px;margin-top:auto}
+  .modecard{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.96);border-radius:20px;padding:16px;text-align:left;box-shadow:0 8px 24px rgba(15,23,42,.12);position:relative}
+  .modecard.hot{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff}
+  .modecard.hot small{color:#dcfce7}
+  .modecard i{font-style:normal;font-size:32px;width:48px;text-align:center}
+  .modecard div{flex:1}
+  .modecard b{display:block;font-size:18px;font-weight:900}
+  .modecard small{color:var(--mut);font-weight:600;font-size:13px}
+  .modecard span{font-size:26px;font-weight:900;opacity:.5}
+  .modecard em{position:absolute;top:-6px;right:12px;background:var(--gold);color:#fff;font-style:normal;font-size:11px;font-weight:800;border-radius:999px;padding:3px 8px}
+  .modecard em:empty{display:none}
+  .link{background:none;color:#fff;font-weight:800;margin-top:14px;text-shadow:0 1px 8px rgba(0,0,0,.5);text-decoration:underline}
+  .slides{flex:1;display:flex;align-items:center;justify-content:center;margin:14px 0}
+  .slide{background:#fff;border-radius:24px;padding:22px 18px;text-align:center;box-shadow:0 12px 34px rgba(15,23,42,.18);width:100%;animation:slin .35s ease-out}
+  @keyframes slin{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+  .slide .em{font-size:64px;line-height:1}
+  .slide h3{font-size:24px;font-weight:900;margin:10px 0 6px}
+  .slide p{color:var(--mut);font-size:15px;line-height:1.5}
+  .slide p b{color:var(--ink)}
+  .slide .meter{margin:16px 0 8px}
+  .slide .try{font-weight:900;color:var(--gd);font-size:15px;min-height:22px}
+  .slide .mock{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .slide .mock span{background:#f1f5f9;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:800;color:var(--ink)}
+  .dots{display:flex;justify-content:center;gap:6px;margin-bottom:12px}
+  .dots i{width:8px;height:8px;border-radius:9px;background:rgba(255,255,255,.6)}
+  .dots i.on{width:22px;background:#fff}
+  #loading{position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:9;transition:opacity .4s}
+  #loading img{width:120px;animation:bob 1s ease-in-out infinite}
+  #loading b{color:var(--gd)}
+  @keyframes bob{50%{transform:translateY(-8px)}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="loading"><img src="logo.png" alt=""><b>Otlar egarlanmoqda…</b></div>
+
+<!-- MENU -->
+<div id="menu" class="screen hidden">
+  <div>
+    <div class="brand"><button class="back sm" data-back aria-label="Orqaga">‹</button><img src="logo.png" alt=""><b>Ot<span>bozor</span></b></div>
+    <div class="topright"><span class="coins" id="coins">🪙 0</span><button class="iconbtn" id="mute" aria-label="Ovoz">🔊</button></div>
+    <div class="title"><h1>Ot poygasi</h1><p id="subtitle">800 metr. 5 ta chavandoz. Bitta g'olib.</p></div>
+    <div class="invite hidden" id="invite"><b id="invtitle">Do'stingiz sizni chaqirdi!</b><small id="invsub"></small><button id="invgo">Qabul qilish</button></div>
+  </div>
+  <div class="card">
+    <div class="picker">
+      <button class="arrow" id="prev" aria-label="Oldingi">‹</button>
+      <div class="hname"><h2 id="hname">Qorabayir</h2><small id="hdesc">Shamoldek tez</small></div>
+      <button class="arrow" id="next" aria-label="Keyingi">›</button>
+    </div>
+    <div class="stat"><label>Tezlik</label><div class="bar"><i id="s1"></i></div></div>
+    <div class="stat"><label>Chidamlilik</label><div class="bar"><i id="s2"></i></div></div>
+    <div class="stat"><label>Boshqaruv</label><div class="bar"><i id="s3"></i></div></div>
+    <a class="real" id="realhorse" href="#">Haqiqiy otlar Otbozor'da ›</a>
+    <div class="chips" id="chips"></div>
+    <div class="meta"><span>Daraja: <b id="lvl">1</b></span><span>G'alaba: <b id="wins">0</b></span><span>Rekord: <b id="best">—</b></span></div>
+    <button class="btn" id="start">Poygani boshlash</button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="home" class="screen">
+  <div class="homebar">
+    <div class="brand"><img src="logo.png" alt=""><b>Ot<span>bozor</span></b></div>
+    <div class="topright2"><span class="coins" id="hcoins">🪙 0</span><button class="iconbtn" id="hmute" aria-label="Ovoz">🔊</button></div>
+  </div>
+  <div class="hero">
+    <img src="logo.png" alt="">
+    <h1>OTBOZOR<br><span>POYGA</span></h1>
+    <p>Milliy ot sporti endi telefoningizda</p>
+  </div>
+  <div class="homebtns">
+    <button class="btn big" id="hplay">▶ O'ynash</button>
+    <button class="btn ghost" id="hhow">📖 Qanday o'ynash</button>
+    <div class="grid2"><button id="bshop">🛒 Do'kon</button><button id="btop">🏆 Reyting</button></div>
+  </div>
+</div>
+
+<!-- MODES -->
+<div id="modes" class="screen hidden">
+  <div class="navbar"><button class="back" data-back aria-label="Orqaga">‹</button><h2>Bo'limni tanlang</h2><span class="coins" id="mcoins">🪙 0</span></div>
+  <div class="invite hidden" id="kinvite" style="margin:0 0 12px"><b id="kinvtitle">Do'stingiz chaqirdi!</b><small id="kinvsub"></small><button id="kinvgo">Qabul qilish</button></div>
+  <div class="modelist">
+    <button class="modecard hot" id="brace"><i>🏇</i><div><b>Poyga</b><small>4 ta trassa, 5 chavandoz, 800 metr</small></div><span>›</span></button>
+    <button class="modecard" id="bdaily"><i>📅</i><div><b>Kunlik poyga</b><small>Har kuni yangi trassa, tangalar 2 baravar</small></div><em id="streak"></em><span>›</span></button>
+    <button class="modecard" id="bkop"><i>🐐</i><div><b>Ko'pkari</b><small>Uloqni olib, qozonga tashlang</small></div><span>›</span></button>
+    <button class="modecard" id="bfriend"><i>👥</i><div><b>Do'st bilan bellashuv</b><small>Do'stingizni o'z natijangizga qarshi chaqiring</small></div><span>›</span></button>
+  </div>
+  <button class="link" id="mhow">Qanday o'ynashni ko'rish</button>
+</div>
+
+<!-- TUTORIAL -->
+<div id="tut" class="screen hidden">
+  <div class="navbar"><button class="back" data-back aria-label="Orqaga">‹</button><h2>Qanday o'ynash</h2><button class="skip" id="tskip">O'tkazish</button></div>
+  <div class="slides" id="slides"></div>
+  <div class="dots" id="tdots"></div>
+  <button class="btn" id="tnext">Keyingi</button>
+</div>
+
+<!-- HUD -->
+<div id="hud" class="screen hidden">
+  <div class="hudtop">
+    <div class="pos"><small>O'RIN</small><b id="place">1<sup>/5</sup></b></div>
+    <div class="track">
+      <div class="trackrow"><span>Marragacha</span><b id="left">800 m</b></div>
+      <div class="lane" id="lane"><div class="fin"></div></div>
+      <div class="trackrow" style="margin-top:6px"><span>Vaqt</span><b id="time">0.00</b></div>
+    </div>
+  </div>
+  <div class="hudbot">
+    <div class="gauges">
+      <div class="gauge" id="stam"><div class="trackrow"><span>KUCH</span><b id="stamv">100%</b></div><div class="bar"><i id="stamb" style="width:100%"></i></div></div>
+      <div class="gauge speed"><div class="trackrow"><span>TEZLIK</span><span>km/soat</span></div><b id="spd">0</b></div>
+    </div>
+    <div class="rhythm">
+      <div class="tapline"><span>Yashil zonada bosing</span><span class="combo" id="combo"></span></div>
+      <div class="meter" id="meter"><div class="zone" id="zgood"></div><div class="zone" id="zperf"></div><div class="needle" id="needle"></div></div>
+    </div>
+  </div>
+</div>
+<div id="khud" class="screen hidden">
+  <div class="hudtop">
+    <div class="pos"><small>HISOB</small><b id="kscore">0</b></div>
+    <div class="track">
+      <div class="trackrow"><span id="kbestl">Raqiblar eng ko'pi</span><b id="kbest">0</b></div>
+      <div class="trackrow" style="margin-top:8px"><span>Vaqt</span><b id="ktime">1:30</b></div>
+    </div>
+  </div>
+  <div class="khint" id="khint">Barmog'ingizni ushlab turing: ot o'sha tomonga chopadi</div>
+  <button class="kdash" id="kdash">⚡ Tezlash</button>
+  <div class="tug hidden" id="tug"><b id="tugt">Tortishuv! Tez-tez bosing!</b><div class="bar"><i id="tugb"></i></div></div>
+</div>
+<div class="joy hidden" id="joy"><i id="joyk"></i></div>
+<div class="pop" id="pop"></div>
+<div class="count hidden" id="count"></div>
+<div class="tip hidden" id="tip"><b>Qanday o'ynash</b>Strelka <span>yashil zonaga</span> kirganda ekranga bosing. Ketma-ket aniq zarb kombo va tezlik beradi. Tartibsiz bossangiz ot charchaydi.</div>
+<div class="banner"><span id="banner"></span></div>
+<div id="vign"></div>
+
+<!-- SHEETS -->
+<div id="sheet" class="sheetwrap hidden">
+  <div class="sheet">
+    <div class="sheethead"><h3 id="sheettitle"></h3><button class="x" id="sheetx" aria-label="Yopish">✕</button></div>
+    <div id="sheetbody"></div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="screen hidden">
+  <div class="place"><div class="big" id="rplace">1<sup>-o'rin</sup></div><div class="sub" id="rsub">G'alaba!</div><div class="stars" id="stars">★★★</div></div>
+  <div class="card">
+    <div class="rows">
+      <div>VAQT<b id="rtime">0.00</b></div>
+      <div>REKORD<b id="rbest">0.00</b></div>
+      <div>ANIQ ZARB<b id="racc" class="nb">0%</b></div>
+    </div>
+    <div class="earn" id="earn"></div>
+    <div class="order" id="order"></div>
+    <div class="btnrow">
+      <button class="btn ghost" id="share">👥 Bellashuv</button>
+      <button class="btn" id="again">Yana poyga</button>
+    </div>
+    <div class="cta">
+      <img src="logo.png" alt="">
+      <div><b>Haqiqiy ot kerakmi?</b><small>E'lonlar va jabduqlar Otbozor'da</small></div>
+      <button id="ctabot">@otbozor_bot</button>
+    </div>
+  </div>
+  <a class="site" id="ctasite" href="https://otbozor.uz" target="_blank" rel="noopener">otbozor.uz saytida ko'rish ›</a>
+</div>
+
+<script src="config.js"></script>
+<script type="importmap">{"imports":{"three":"./three.module.min.js"}}</script>
+<script type="module" src="game.js"></script>
+</body>
+</html>

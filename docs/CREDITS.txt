@@ -1,0 +1,2 @@
+Horse model: "Horse" by Quaternius (quaternius.com), CC0 / Public Domain.
+Three.js r170 (MIT).
