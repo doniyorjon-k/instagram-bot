@@ -782,7 +782,8 @@ function renderMenu() {
   $('lvl').textContent = level(); $('wins').textContent = wins();
   const b = store.get('best_' + themeSel, null); $('best').textContent = b ? b.toFixed(2) + ' s' : '—';
   $('mute').textContent = muted ? '🔇' : '🔊';
-  $('coins').textContent = '🪙 ' + coins();
+  $('coins').textContent = $('hcoins').textContent = $('mcoins').textContent = '🪙 ' + coins();
+  $('hmute').textContent = muted ? '🔇' : '🔊';
   $('subtitle').textContent = THEMES[themeSel].sub + '. 800 metr, 5 chavandoz.';
   const st = streakInfo(); $('streak').textContent = st.doneToday ? '✓' : st.streak ? '🔥' + st.streak : 'yangi';
   const start = $('start');
@@ -814,7 +815,7 @@ $('start').onclick = () => {
   if (!isOwned(sel)) { if (buyHorse(sel)) renderMenu(); else { haptic('notify', 'error'); banner("Tanga yetmaydi. Poygada yutib to'plang!"); } return; }
   startRace({});
 };
-$('again').onclick = () => { Audio.init(); haptic('impact', 'medium'); toMenu(); };
+$('again').onclick = () => { Audio.init(); haptic('impact', 'medium'); if (lastResult && lastResult.kop) goto('modes'); else toMenu(); };
 $('ctabot').onclick = () => openTg(BOT_URL);
 $('ctasite').onclick = (e) => { e.preventDefault(); openLink(SITE_URL); };
 $('realhorse').onclick = (e) => { e.preventDefault(); openLink(SITE_URL); };
@@ -932,7 +933,6 @@ function openTop(period = 'week') {
   }).catch(() => openSheet('Reyting', tabs + prize + `<div class="note">Reytingni yuklab bo'lmadi. Internetni tekshirib qayta urinib ko'ring.</div>`, bind));
 }
 $('btop').onclick = () => { Audio.init(); openTop('week'); };
-$('bkop').onclick = () => { Audio.init(); if (!isOwned(sel)) { sel = 0; buildPlayer(); } Kop.start(); };
 
 let popT = 0;
 function pop(text, color) {
@@ -998,9 +998,10 @@ function resetRace() {
 function setRivals(v) { for (const r of rivals) r.mesh.visible = v; if (ghost) ghost.mesh.visible = v; }
 function toMenu() {
   mode = 'menu'; Audio.cheer(false); setRivals(false); Kop.stop();
-  hide(ui.result); hide(ui.hud); show(ui.menu); show(canvas);
+  screenName = 'menu'; for (const id of ['home', 'modes', 'tut', 'khud']) hide($(id));
+  hide(ui.result); hide(ui.hud); show(ui.menu); show(canvas); syncBack();
   raceOpts = {}; applyTheme(themeSel); player.mesh.position.set(LANES[PLAYER_LANE], 0, 0); player.mesh.rotation.y = 0; scene.add(player.mesh);
-  resetRace(); renderMenu();
+  resetRace(); renderMenu(); snapCam = true;
 }
 
 function startRace(opts) {
@@ -1008,7 +1009,8 @@ function startRace(opts) {
   if (!raceOpts.daily && !raceOpts.ghost) applyTheme(themeSel);
   mode = 'count';
   resetRace();
-  hide(ui.menu); hide(ui.result); hide(ui.sheet); show(ui.hud); setRivals(true);
+  hide(ui.menu); hide(ui.result); hide(ui.sheet); for (const id of ['home', 'modes', 'tut']) hide($(id)); show(ui.hud); setRivals(true);
+  screenName = 'race'; syncBack();
   if (ghost) rivals[1].mesh.visible = false;
   countT = 3.0; goTime = -1;
   ui.count.classList.remove('hidden', 'go');
@@ -1250,6 +1252,7 @@ function showResult(isBest) {
 /* ================= CAMERA ================= */
 const DEBUG_CAM = (/[?&]cam=([-\d.]+),([-\d.]+),([-\d.]+)/.exec(location.search) || null)?.slice(1).map(Number);
 const camPos = new THREE.Vector3(6, 3, 8), camLook = new THREE.Vector3();
+let snapCam = true;
 function updateCamera(dt, t) {
   if (mode === 'kop') return Kop.camera(dt, camPos, camLook);
   const p = player.mesh.position;
@@ -1257,6 +1260,12 @@ function updateCamera(dt, t) {
   let want, look, fov = 55;
   if (DEBUG_CAM) {
     want = new THREE.Vector3(p.x + DEBUG_CAM[0], DEBUG_CAM[1], p.z + DEBUG_CAM[2]); look = new THREE.Vector3(p.x, 1.1, p.z);
+  } else if (mode === 'home') {
+    menuSpin += dt * 0.12;
+    const a = Math.sin(menuSpin) * 0.9;
+    want = new THREE.Vector3(p.x + 3 + Math.cos(a) * 5.5, 1.5 + Math.sin(menuSpin * 1.7) * 0.4, p.z - 3 - Math.sin(a) * 5);
+    look = new THREE.Vector3(p.x - 1.2, 1.5, p.z - 1.5);
+    fov = 50;
   } else if (mode === 'menu') {
     menuSpin += dt * 0.35;
     const a = 0.9 + Math.sin(menuSpin) * 0.5;
@@ -1285,6 +1294,7 @@ function updateCamera(dt, t) {
     want = new THREE.Vector3(p.x + Math.sin(finishCam + 0.8) * 7, 2.6, p.z + Math.cos(finishCam + 0.8) * 7);
     look = new THREE.Vector3(p.x, 1.4, p.z);
   }
+  if (snapCam) { camPos.copy(want); camLook.copy(look); camera.fov = fov; snapCam = false; }
   const finalShot = mode === 'race' && player.z > RACE - 110;
   const k = finalShot ? 1 - Math.pow(0.08, dt) : mode === 'race' ? 1 - Math.pow(0.0005, dt) : mode === 'finish' && slowT > 0 ? 1 - Math.pow(0.000001, dt) : 1 - Math.pow(0.02, dt);
   camKick = Math.max(0, camKick - dt);
@@ -1337,6 +1347,7 @@ function step(dt) {
     for (const h of field) { if (h.ghost) { h.z = ghostZ(h, raceT); continue; } h.v *= (h === player ? 0.975 : 0.99); h.z += h.v * dt; }
     for (const h of field) if (!h.done && h.z >= RACE) { h.done = true; h.time = h.ghost ? h.splits[7] : raceT - (h.z - RACE) / Math.max(1, h.v); finishOrder.push(h); }
   } else if (mode === 'kop') { Kop.update(dt); }
+  else if (mode === 'home') stepAttract(dt);
   if (mode !== 'kop') for (const h of field) {
     h.mesh.position.z = -h.z;
     if (!h.me) h.mesh.position.x = h.lane + Math.sin(T * 0.4 + h.seed) * 0.35;
@@ -1356,6 +1367,123 @@ function step(dt) {
 const Kop = createKopkari({ THREE, scene, camera, makeHorse, animateHorse, HORSES, RIVALS, SILKS, puff, pop, banner, haptic, Audio, store, addCoins, canvasTex, textTex,
   getSel: () => ({ sel, silkSel }), ui: { $, show, hide, esc }, submitScore, onExit: () => toMenu(), setResult: (r) => { lastResult = r; }, setMode: (m) => { mode = m; }, world, sun, applyTheme });
 applyTheme(themeSel); renderChips();
-renderMenu(); layoutZones(); setupDots(); setRivals(false);
+
+/* ================= NAVIGATION: home → modes → setup, tutorial ================= */
+let screenName = 'home';
+const SCREENS = ['home', 'modes', 'tut', 'menu'];
+function goto(name) {
+  screenName = name;
+  for (const s of SCREENS) (s === name ? show : hide)($(s));
+  hide(ui.result); hide(ui.hud); hide($('khud')); hide(ui.sheet);
+  if (name === 'menu') { toMenu(); return; }
+  if (mode !== 'home') startAttract();
+  renderMenu();
+  syncBack();
+}
+function syncBack() {
+  try {
+    if (!tg || !tg.BackButton) return;
+    if (['modes', 'tut', 'menu'].includes(screenName)) tg.BackButton.show();
+    else tg.BackButton.hide();
+  } catch {}
+}
+function goBack() {
+  if (!ui.sheet.classList.contains('hidden')) return hide(ui.sheet);
+  if (screenName === 'tut') return goto(tutReturn);
+  if (screenName === 'menu') return goto('modes');
+  if (screenName === 'modes') return goto('home');
+}
+document.querySelectorAll('[data-back]').forEach((b) => b.onclick = () => { Audio.init(); Audio.click(); goBack(); });
+try { tg && tg.BackButton && tg.BackButton.onClick(goBack); } catch {}
+
+function startAttract() {
+  mode = 'home'; snapCam = true; Kop.stop(); Audio.cheer(false);
+  raceOpts = {}; applyTheme(themeSel === 'tog' ? 'dala' : themeSel, false);
+  if (ghost) { scene.remove(ghost.mesh); ghost = null; }
+  field = [player, ...rivals]; foes = rivals.slice();
+  for (const r of rivals) r.mesh.visible = true;
+  field.forEach((h, i) => { h.z = 40 + (i ? (Math.random() * 6 - 3) : 0); h.v = 16; h.attract = 15.5 + Math.random() * 1.2; h.mesh.userData.jumpT = 0; });
+  player.mesh.position.x = LANES[PLAYER_LANE]; player.mesh.rotation.y = 0;
+}
+function stepAttract(dt) {
+  for (const h of field) {
+    h.attract += (Math.random() - 0.5) * dt * 0.8; h.attract = Math.max(15, Math.min(17.5, h.attract));
+    h.v += (h.attract - h.v) * dt; h.z += h.v * dt;
+    if (!h.me && h.z - player.z > 6) h.attract -= dt * 2; if (!h.me && player.z - h.z > 8) h.attract += dt * 2;
+  }
+  if (player.z > 640) { for (const h of field) h.z -= 560; camPos.z += 560; camLook.z += 560; }
+}
+
+$('hplay').onclick = () => {
+  Audio.init(); haptic('impact', 'medium');
+  if (!store.get('tutDone', false)) return openTut(challenge ? 'menu' : 'modes');
+  goto(challenge ? 'menu' : 'modes');
+};
+$('hhow').onclick = () => { Audio.init(); openTut('home'); };
+$('mhow').onclick = () => { Audio.init(); openTut('modes'); };
+$('hmute').onclick = () => { muted = !muted; store.set('muted', muted); Audio.init(); Audio.setMuted(muted); renderMenu(); };
+$('brace').onclick = () => { Audio.init(); haptic('impact', 'light'); goto('menu'); };
+$('bfriend').onclick = () => {
+  Audio.init();
+  openSheet("Do'st bilan bellashuv", `
+    <div class="daily"><h4>👻 Arvoh otga qarshi poyga</h4><p>Do'stingiz sizning natijangizga qarshi chopadi: ekranda sizning shaffof "arvoh" otingiz aynan siz yugurgandek yuguradi.</p></div>
+    <div class="note"><b>1.</b> Oddiy poyga o'ynang.<br><b>2.</b> Natija oynasida <b>👥 Bellashuv</b> tugmasini bosing.<br><b>3.</b> Do'stingizni tanlab yuboring.<br><b>4.</b> U havolani ochsa, sizning otingizga qarshi poyga boshlanadi. Arvohni yutgan +50 🪙 oladi.</div>
+    <button class="btn" id="fgo" style="margin-top:12px">Poygaga o'tish</button>`, (root) => { root.querySelector('#fgo').onclick = () => { hide(ui.sheet); goto('menu'); }; });
+};
+$('bkop').onclick = () => {
+  Audio.init();
+  openSheet("Ko'pkari", `
+    <div class="daily"><h4>🐐 Uloqni qozonga tashlang</h4><p>6 chavandoz, 90 soniya. Eng ko'p "halol" qilgan g'olib.</p></div>
+    <div class="note"><b>Boshqarish:</b> barmog'ingizni ekranga qo'yib, kerakli tomonga suring.<br>
+    <b>Uloq:</b> o'rtadagi sariq halqaga yetib boring, uloq o'zi qo'lingizga o'tadi.<br>
+    <b>Halol:</b> uloqni yashil "Qozon" aylanasiga olib kiring.<br>
+    <b>Tortishuv:</b> raqib yaqinlashsa, ekranni tez-tez bosing.</div>
+    <button class="btn" id="kgo" style="margin-top:12px">Ko'pkarini boshlash</button>`, (root) => {
+    root.querySelector('#kgo').onclick = () => { hide(ui.sheet); hide($('modes')); screenName = 'kop'; syncBack(); if (!isOwned(sel)) { sel = 0; buildPlayer(); } Kop.start(); };
+  });
+};
+
+/* ---------- tutorial ---------- */
+const TUT = [
+  { em: '🏇', h: 'Xush kelibsiz!', p: "Siz chavandozsiz. Otingizni tanlang, raqiblarni ortda qoldiring va <b>tanga</b> yig'ing. Bir daqiqada o'rganasiz." },
+  { em: '🎯', h: 'Ritmda bosing', p: "Pastda strelka yurib turadi. U <b>yashil zonaga</b> kirganda ekranga bosing: ot tezlashadi. Ketma-ket aniq bossangiz <b>kombo</b> bo'ladi.", meter: true },
+  { em: '💪', h: 'Kuchni asrang', p: "Har zarb otning <b>kuchini</b> sarflaydi. Tartibsiz bossangiz ot tez charchaydi va sekinlashadi. Shoshilmang, aniq bosing.", mock: ['KUCH 100%', 'TEZLIK 72 km/soat', 'KOMBO x5'] },
+  { em: '🚧', h: "To'siqlar", p: "Tog' trassasida to'siqlar bor. To'siq yaqinlashganda chiziq <b>sakrash</b> chizig'iga aylanadi. Yashil zonada bossangiz, ot sakraydi." },
+  { em: '🐐', h: "Ko'pkari", p: "Barmog'ingizni surib otni boshqarasiz. Uloqni olib, <b>qozonga</b> tashlang. Raqib tortib olmoqchi bo'lsa, ekranni tez-tez bosing." },
+  { em: '🪙', h: "Tanga va do'kon", p: "Tangaga yangi otlar va chavandoz kiyimi oling. <b>Kunlik poyga</b> har kuni bonus beradi, do'stlaringizni <b>bellashuvga</b> chaqiring.", mock: ['Lokay', 'Axalteke', 'Arab oti'] },
+];
+let tutI = 0, tutReturn = 'modes', tutHits = 0, tutRaf = 0, tutT = 0;
+function openTut(ret) {
+  tutReturn = ret; tutI = 0; goto('tut'); renderTut();
+}
+function renderTut() {
+  const s = TUT[tutI];
+  cancelAnimationFrame(tutRaf); tutHits = 0;
+  $('slides').innerHTML = `<div class="slide"><div class="em">${s.em}</div><h3>${s.h}</h3><p>${s.p}</p>
+    ${s.meter ? `<div class="meter" id="tmeter"><div class="zone" style="left:31%;width:38%;background:#fde68a"></div><div class="zone" style="left:42%;width:16%;background:var(--g);box-shadow:0 0 18px rgba(22,163,74,.7)"></div><div class="needle" id="tneedle"></div></div><div class="try" id="ttry">Sinab ko'ring: shu yerga 3 marta aniq bosing</div>` : ''}
+    ${s.mock ? `<div class="mock">${s.mock.map((m) => `<span>${m}</span>`).join('')}</div>` : ''}</div>`;
+  $('tdots').innerHTML = TUT.map((_, i) => `<i class="${i === tutI ? 'on' : ''}"></i>`).join('');
+  $('tnext').textContent = tutI === TUT.length - 1 ? 'Boshladik! 🏁' : 'Keyingi';
+  if (s.meter) {
+    const nd = $('tneedle'); tutT = 0; let last = performance.now();
+    const loop = (now) => { tutT += (now - last) / 1000 * 1.2; last = now; nd.style.left = (1 - Math.abs((tutT % 2) - 1)) * 100 + '%'; tutRaf = requestAnimationFrame(loop); };
+    tutRaf = requestAnimationFrame(loop);
+    $('tmeter').parentElement.onpointerdown = () => {
+      Audio.init();
+      const pos = 1 - Math.abs((tutT % 2) - 1), d = Math.abs(pos - 0.5) * 2;
+      if (d <= 0.16) { tutHits++; Audio.perfect(tutHits); haptic('impact', 'medium'); $('ttry').textContent = tutHits >= 3 ? "Zo'r! Siz tayyorsiz ✓" : `Zo'r! ${tutHits}/3`; }
+      else if (d <= 0.38) { Audio.good(); haptic('impact', 'light'); $('ttry').textContent = `Yaxshi, lekin yashilroq bo'lsin (${tutHits}/3)`; }
+      else { Audio.miss(); haptic('notify', 'error'); $('ttry').textContent = `O'tkazib yubordingiz, qayta urinib ko'ring (${tutHits}/3)`; }
+    };
+  }
+}
+$('tnext').onclick = () => {
+  Audio.init(); Audio.click();
+  if (tutI < TUT.length - 1) { tutI++; renderTut(); return; }
+  cancelAnimationFrame(tutRaf); store.set('tutDone', true); goto(tutReturn === 'home' ? 'modes' : tutReturn);
+};
+$('tskip').onclick = () => { cancelAnimationFrame(tutRaf); store.set('tutDone', true); goto(tutReturn === 'home' ? 'home' : tutReturn); };
+
+layoutZones(); goto('home');
 requestAnimationFrame((t) => { last = t; frame(t); });
 setTimeout(() => { const l = $('loading'); l.style.opacity = 0; setTimeout(() => l.remove(), 450); }, 350);

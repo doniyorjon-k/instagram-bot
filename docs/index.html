@@ -193,6 +193,49 @@
   .joy{position:fixed;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.7);pointer-events:none;z-index:3}
   .joy i{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:rgba(22,163,74,.85);box-shadow:0 4px 12px rgba(0,0,0,.25)}
   .meter.jump{background:linear-gradient(90deg,#e2e8f0,#e2e8f0)}
+  .homebar{display:flex;justify-content:space-between;align-items:center}
+  .topright2{display:flex;gap:8px;align-items:center}
+  .topright2 .iconbtn{position:static}
+  .hero{margin:auto 0;text-align:center;color:#fff}
+  .hero img{width:120px;filter:drop-shadow(0 8px 18px rgba(0,0,0,.35));animation:bob 2.4s ease-in-out infinite}
+  .hero h1{font-size:46px;line-height:.95;font-weight:900;letter-spacing:-1px;text-shadow:0 3px 0 var(--gd),0 10px 30px rgba(0,0,0,.35);margin-top:6px}
+  .hero h1 span{color:#bbf7d0}
+  .hero p{font-weight:700;margin-top:10px;text-shadow:0 2px 10px rgba(0,0,0,.5)}
+  .homebtns{display:flex;flex-direction:column;gap:12px}
+  .btn.big{font-size:22px;padding:20px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .grid2 button{background:rgba(255,255,255,.95);border-radius:16px;padding:14px;font-weight:800;font-size:15px;color:var(--ink);box-shadow:0 6px 18px rgba(15,23,42,.12)}
+  .navbar{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.95);border-radius:18px;padding:8px 10px;box-shadow:0 6px 18px rgba(15,23,42,.1)}
+  .navbar h2{flex:1;font-size:18px;font-weight:900}
+  .back{width:40px;height:40px;border-radius:12px;background:#f1f5f9;font-size:26px;font-weight:900;color:var(--ink);line-height:1;flex:none}
+  .back.sm{width:30px;height:30px;font-size:22px;border-radius:50%;margin-right:-2px}
+  .skip{background:none;color:var(--mut);font-weight:800;font-size:13px;padding:8px}
+  .modelist{display:flex;flex-direction:column;gap:12px;margin-top:auto}
+  .modecard{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.96);border-radius:20px;padding:16px;text-align:left;box-shadow:0 8px 24px rgba(15,23,42,.12);position:relative}
+  .modecard.hot{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff}
+  .modecard.hot small{color:#dcfce7}
+  .modecard i{font-style:normal;font-size:32px;width:48px;text-align:center}
+  .modecard div{flex:1}
+  .modecard b{display:block;font-size:18px;font-weight:900}
+  .modecard small{color:var(--mut);font-weight:600;font-size:13px}
+  .modecard span{font-size:26px;font-weight:900;opacity:.5}
+  .modecard em{position:absolute;top:-6px;right:12px;background:var(--gold);color:#fff;font-style:normal;font-size:11px;font-weight:800;border-radius:999px;padding:3px 8px}
+  .modecard em:empty{display:none}
+  .link{background:none;color:#fff;font-weight:800;margin-top:14px;text-shadow:0 1px 8px rgba(0,0,0,.5);text-decoration:underline}
+  .slides{flex:1;display:flex;align-items:center;justify-content:center;margin:14px 0}
+  .slide{background:#fff;border-radius:24px;padding:22px 18px;text-align:center;box-shadow:0 12px 34px rgba(15,23,42,.18);width:100%;animation:slin .35s ease-out}
+  @keyframes slin{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+  .slide .em{font-size:64px;line-height:1}
+  .slide h3{font-size:24px;font-weight:900;margin:10px 0 6px}
+  .slide p{color:var(--mut);font-size:15px;line-height:1.5}
+  .slide p b{color:var(--ink)}
+  .slide .meter{margin:16px 0 8px}
+  .slide .try{font-weight:900;color:var(--gd);font-size:15px;min-height:22px}
+  .slide .mock{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .slide .mock span{background:#f1f5f9;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:800;color:var(--ink)}
+  .dots{display:flex;justify-content:center;gap:6px;margin-bottom:12px}
+  .dots i{width:8px;height:8px;border-radius:9px;background:rgba(255,255,255,.6)}
+  .dots i.on{width:22px;background:#fff}
   #loading{position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:9;transition:opacity .4s}
   #loading img{width:120px;animation:bob 1s ease-in-out infinite}
   #loading b{color:var(--gd)}
@@ -205,9 +248,9 @@
 <div id="loading"><img src="logo.png" alt=""><b>Otlar egarlanmoqda…</b></div>
 
 <!-- MENU -->
-<div id="menu" class="screen">
+<div id="menu" class="screen hidden">
   <div>
-    <div class="brand"><img src="logo.png" alt=""><b>Ot<span>bozor</span></b></div>
+    <div class="brand"><button class="back sm" data-back aria-label="Orqaga">‹</button><img src="logo.png" alt=""><b>Ot<span>bozor</span></b></div>
     <div class="topright"><span class="coins" id="coins">🪙 0</span><button class="iconbtn" id="mute" aria-label="Ovoz">🔊</button></div>
     <div class="title"><h1>Ot poygasi</h1><p id="subtitle">800 metr. 5 ta chavandoz. Bitta g'olib.</p></div>
     <div class="invite hidden" id="invite"><b id="invtitle">Do'stingiz sizni chaqirdi!</b><small id="invsub"></small><button id="invgo">Qabul qilish</button></div>
@@ -225,13 +268,45 @@
     <div class="chips" id="chips"></div>
     <div class="meta"><span>Daraja: <b id="lvl">1</b></span><span>G'alaba: <b id="wins">0</b></span><span>Rekord: <b id="best">—</b></span></div>
     <button class="btn" id="start">Poygani boshlash</button>
-    <div class="modes">
-      <button id="bdaily"><i>📅</i>Kunlik<em id="streak"></em></button>
-      <button id="bkop"><i>🐐</i>Ko'pkari</button>
-      <button id="bshop"><i>🛒</i>Do'kon</button>
-      <button id="btop"><i>🏆</i>Reyting</button>
-    </div>
   </div>
+</div>
+
+<!-- HOME -->
+<div id="home" class="screen">
+  <div class="homebar">
+    <div class="brand"><img src="logo.png" alt=""><b>Ot<span>bozor</span></b></div>
+    <div class="topright2"><span class="coins" id="hcoins">🪙 0</span><button class="iconbtn" id="hmute" aria-label="Ovoz">🔊</button></div>
+  </div>
+  <div class="hero">
+    <img src="logo.png" alt="">
+    <h1>OTBOZOR<br><span>POYGA</span></h1>
+    <p>Milliy ot sporti endi telefoningizda</p>
+  </div>
+  <div class="homebtns">
+    <button class="btn big" id="hplay">▶ O'ynash</button>
+    <button class="btn ghost" id="hhow">📖 Qanday o'ynash</button>
+    <div class="grid2"><button id="bshop">🛒 Do'kon</button><button id="btop">🏆 Reyting</button></div>
+  </div>
+</div>
+
+<!-- MODES -->
+<div id="modes" class="screen hidden">
+  <div class="navbar"><button class="back" data-back aria-label="Orqaga">‹</button><h2>Bo'limni tanlang</h2><span class="coins" id="mcoins">🪙 0</span></div>
+  <div class="modelist">
+    <button class="modecard hot" id="brace"><i>🏇</i><div><b>Poyga</b><small>4 ta trassa, 5 chavandoz, 800 metr</small></div><span>›</span></button>
+    <button class="modecard" id="bdaily"><i>📅</i><div><b>Kunlik poyga</b><small>Har kuni yangi trassa, tangalar 2 baravar</small></div><em id="streak"></em><span>›</span></button>
+    <button class="modecard" id="bkop"><i>🐐</i><div><b>Ko'pkari</b><small>Uloqni olib, qozonga tashlang</small></div><span>›</span></button>
+    <button class="modecard" id="bfriend"><i>👥</i><div><b>Do'st bilan bellashuv</b><small>Do'stingizni o'z natijangizga qarshi chaqiring</small></div><span>›</span></button>
+  </div>
+  <button class="link" id="mhow">Qanday o'ynashni ko'rish</button>
+</div>
+
+<!-- TUTORIAL -->
+<div id="tut" class="screen hidden">
+  <div class="navbar"><button class="back" data-back aria-label="Orqaga">‹</button><h2>Qanday o'ynash</h2><button class="skip" id="tskip">O'tkazish</button></div>
+  <div class="slides" id="slides"></div>
+  <div class="dots" id="tdots"></div>
+  <button class="btn" id="tnext">Keyingi</button>
 </div>
 
 <!-- HUD -->
