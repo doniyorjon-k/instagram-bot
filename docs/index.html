@@ -137,6 +137,62 @@
     font-size:14px;line-height:1.45;color:var(--mut);text-align:center;box-shadow:0 10px 30px rgba(15,23,42,.15);pointer-events:none}
   .tip b{display:block;color:var(--ink);margin-bottom:2px}
   .tip span{color:var(--gd);font-weight:800}
+  .topright{position:absolute;right:16px;top:calc(var(--top) + 14px);display:flex;gap:8px;align-items:center}
+  .topright .iconbtn{position:static}
+  .coins{background:rgba(255,255,255,.95);border-radius:999px;padding:9px 12px;font-weight:900;font-size:14px;box-shadow:0 4px 14px rgba(15,23,42,.1)}
+  .real{display:block;text-align:center;font-size:12px;font-weight:700;color:var(--gd);margin-top:8px;text-decoration:none}
+  .chips{display:flex;gap:6px;margin-top:10px;overflow-x:auto;scrollbar-width:none}
+  .chips button{flex:1;white-space:nowrap;background:#f1f5f9;color:var(--mut);font-weight:800;font-size:12px;border-radius:10px;padding:8px 6px}
+  .chips button.on{background:var(--gl);color:var(--gd);box-shadow:inset 0 0 0 2px var(--g)}
+  .modes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+  .modes button{background:#f8fafc;border:1.5px solid var(--line);border-radius:14px;padding:8px 2px;font-weight:800;font-size:12px;color:var(--ink);position:relative}
+  .modes i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}
+  .modes em{position:absolute;top:-6px;right:-4px;background:var(--gold);color:#fff;font-style:normal;font-size:10px;border-radius:999px;padding:2px 6px}
+  .modes em:empty{display:none}
+  .invite{margin-top:12px;background:rgba(15,23,42,.88);color:#fff;border-radius:18px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}
+  .invite small{grid-column:1;opacity:.8;font-size:12px}
+  .invite button{grid-row:1/3;grid-column:2;background:var(--g);color:#fff;font-weight:800;border-radius:12px;padding:10px 12px}
+  .sheetwrap{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:flex-end;z-index:5}
+  .sheet{background:#fff;width:100%;max-height:86%;overflow:auto;border-radius:24px 24px 0 0;padding:16px 16px calc(var(--bot) + 18px);touch-action:pan-y}
+  .sheethead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .sheethead h3{font-size:22px;font-weight:900}
+  .x{width:36px;height:36px;border-radius:50%;background:#f1f5f9;font-size:16px}
+  .item{display:flex;align-items:center;gap:12px;padding:12px;border:1.5px solid var(--line);border-radius:16px;margin-bottom:8px}
+  .item.on{border-color:var(--g);background:var(--gl)}
+  .sw{width:40px;height:40px;border-radius:12px;flex:none;box-shadow:inset 0 0 0 2px rgba(0,0,0,.08)}
+  .item div{flex:1;min-width:0}
+  .item b{display:block;font-size:15px}
+  .item small{color:var(--mut);font-size:12px;font-weight:600}
+  .item button{background:var(--g);color:#fff;font-weight:800;border-radius:12px;padding:9px 12px;font-size:13px;white-space:nowrap}
+  .item button.own{background:#f1f5f9;color:var(--mut)}
+  .item button:disabled{opacity:.45}
+  .sec{font-size:12px;font-weight:800;color:var(--mut);letter-spacing:.6px;margin:14px 2px 8px}
+  .tabs{display:flex;gap:6px;margin-bottom:10px}
+  .tabs button{flex:1;background:#f1f5f9;border-radius:10px;padding:9px;font-weight:800;color:var(--mut)}
+  .tabs button.on{background:var(--ink);color:#fff}
+  .row{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line);font-weight:700}
+  .row .n{width:26px;color:var(--mut)}
+  .row .t{margin-left:auto;font-variant-numeric:tabular-nums}
+  .row.me{background:var(--gl);border-radius:10px}
+  .note{background:#f8fafc;border-radius:14px;padding:12px;font-size:13px;color:var(--mut);line-height:1.5}
+  .note b{color:var(--ink)}
+  .daily{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;border-radius:18px;padding:16px;margin-bottom:12px}
+  .daily h4{font-size:20px;font-weight:900}
+  .daily p{opacity:.92;font-size:13px;margin-top:4px;line-height:1.45}
+  .days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:12px 0}
+  .days div{background:#f1f5f9;border-radius:10px;text-align:center;padding:8px 0;font-size:11px;font-weight:800;color:var(--mut)}
+  .days div.on{background:var(--gold);color:#fff}
+  .days div b{display:block;font-size:13px}
+  .earn{text-align:center;font-weight:900;color:var(--gd);margin:-4px 0 8px;font-size:15px}
+  .earn:empty{display:none}
+  #khud{justify-content:space-between}
+  .khint{align-self:center;background:rgba(15,23,42,.8);color:#fff;font-weight:700;font-size:13px;border-radius:999px;padding:8px 14px;text-align:center}
+  .tug{align-self:stretch;background:rgba(255,255,255,.96);border-radius:18px;padding:12px;text-align:center}
+  .tug .bar{height:14px;margin-top:8px}
+  .tug .bar i{background:linear-gradient(90deg,var(--red),var(--gold),var(--g))}
+  .joy{position:fixed;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.7);pointer-events:none;z-index:3}
+  .joy i{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:rgba(22,163,74,.85);box-shadow:0 4px 12px rgba(0,0,0,.25)}
+  .meter.jump{background:linear-gradient(90deg,#e2e8f0,#e2e8f0)}
   #loading{position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:9;transition:opacity .4s}
   #loading img{width:120px;animation:bob 1s ease-in-out infinite}
   #loading b{color:var(--gd)}
@@ -152,8 +208,9 @@
 <div id="menu" class="screen">
   <div>
     <div class="brand"><img src="logo.png" alt=""><b>Ot<span>bozor</span></b></div>
-    <button class="iconbtn" id="mute" aria-label="Ovoz">🔊</button>
-    <div class="title"><h1>Ot poygasi</h1><p>800 metr. 5 ta chavandoz. Bitta g'olib.</p></div>
+    <div class="topright"><span class="coins" id="coins">🪙 0</span><button class="iconbtn" id="mute" aria-label="Ovoz">🔊</button></div>
+    <div class="title"><h1>Ot poygasi</h1><p id="subtitle">800 metr. 5 ta chavandoz. Bitta g'olib.</p></div>
+    <div class="invite hidden" id="invite"><b id="invtitle">Do'stingiz sizni chaqirdi!</b><small id="invsub"></small><button id="invgo">Qabul qilish</button></div>
   </div>
   <div class="card">
     <div class="picker">
@@ -164,8 +221,16 @@
     <div class="stat"><label>Tezlik</label><div class="bar"><i id="s1"></i></div></div>
     <div class="stat"><label>Chidamlilik</label><div class="bar"><i id="s2"></i></div></div>
     <div class="stat"><label>Boshqaruv</label><div class="bar"><i id="s3"></i></div></div>
-    <div class="meta"><span>Daraja: <b id="lvl">1</b></span><span>G'alabalar: <b id="wins">0</b></span><span>Rekord: <b id="best">—</b></span></div>
+    <a class="real" id="realhorse" href="#">Haqiqiy otlar Otbozor'da ›</a>
+    <div class="chips" id="chips"></div>
+    <div class="meta"><span>Daraja: <b id="lvl">1</b></span><span>G'alaba: <b id="wins">0</b></span><span>Rekord: <b id="best">—</b></span></div>
     <button class="btn" id="start">Poygani boshlash</button>
+    <div class="modes">
+      <button id="bdaily"><i>📅</i>Kunlik<em id="streak"></em></button>
+      <button id="bkop"><i>🐐</i>Ko'pkari</button>
+      <button id="bshop"><i>🛒</i>Do'kon</button>
+      <button id="btop"><i>🏆</i>Reyting</button>
+    </div>
   </div>
 </div>
 
@@ -190,11 +255,31 @@
     </div>
   </div>
 </div>
+<div id="khud" class="screen hidden">
+  <div class="hudtop">
+    <div class="pos"><small>HISOB</small><b id="kscore">0</b></div>
+    <div class="track">
+      <div class="trackrow"><span>Raqiblar eng ko'pi</span><b id="kbest">0</b></div>
+      <div class="trackrow" style="margin-top:8px"><span>Vaqt</span><b id="ktime">1:30</b></div>
+    </div>
+  </div>
+  <div class="khint" id="khint">Barmog'ingizni ushlab turing: ot o'sha tomonga chopadi</div>
+  <div class="tug hidden" id="tug"><b id="tugt">Tortishuv! Tez-tez bosing!</b><div class="bar"><i id="tugb"></i></div></div>
+</div>
+<div class="joy hidden" id="joy"><i id="joyk"></i></div>
 <div class="pop" id="pop"></div>
 <div class="count hidden" id="count"></div>
 <div class="tip hidden" id="tip"><b>Qanday o'ynash</b>Strelka <span>yashil zonaga</span> kirganda ekranga bosing. Ketma-ket aniq zarb kombo va tezlik beradi. Tartibsiz bossangiz ot charchaydi.</div>
 <div class="banner"><span id="banner"></span></div>
 <div id="vign"></div>
+
+<!-- SHEETS -->
+<div id="sheet" class="sheetwrap hidden">
+  <div class="sheet">
+    <div class="sheethead"><h3 id="sheettitle"></h3><button class="x" id="sheetx" aria-label="Yopish">✕</button></div>
+    <div id="sheetbody"></div>
+  </div>
+</div>
 
 <!-- RESULT -->
 <div id="result" class="screen hidden">
@@ -205,9 +290,10 @@
       <div>REKORD<b id="rbest">0.00</b></div>
       <div>ANIQ ZARB<b id="racc" class="nb">0%</b></div>
     </div>
+    <div class="earn" id="earn"></div>
     <div class="order" id="order"></div>
     <div class="btnrow">
-      <button class="btn ghost" id="share">Ulashish</button>
+      <button class="btn ghost" id="share">👥 Bellashuv</button>
       <button class="btn" id="again">Yana poyga</button>
     </div>
     <div class="cta">
@@ -219,6 +305,7 @@
   <a class="site" id="ctasite" href="https://otbozor.uz" target="_blank" rel="noopener">otbozor.uz saytida ko'rish ›</a>
 </div>
 
+<script src="config.js"></script>
 <script type="importmap">{"imports":{"three":"./three.module.min.js"}}</script>
 <script type="module" src="game.js"></script>
 </body>
