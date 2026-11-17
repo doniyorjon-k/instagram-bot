@@ -1,0 +1,298 @@
+From 52575fbff9b0c2d4718deed6537d097408efb99a Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 17 Nov 2026 13:35:51 +0000
+Subject: [PATCH] feat(game): Otbozor Poyga o'yini reytingi (/api/game)
+
+@otbozor_game Telegram Mini App uchun haftalik/oylik reyting.
+GameScore jadvali, initData imzosi GAME_BOT_TOKEN bilan tekshiriladi.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01PPBaAdNy792st7J3AjM3sP
+---
+ .env.example                                  |  2 +
+ .../20261117120000_game_scores/migration.sql  | 19 ++++
+ prisma/schema.prisma                          | 16 ++++
+ src/app.module.ts                             |  4 +
+ src/game/game.controller.ts                   | 51 ++++++++++
+ src/game/game.module.ts                       |  9 ++
+ src/game/game.service.ts                      | 93 +++++++++++++++++++
+ src/game/zz-serve.ts                          | 10 ++
+ 8 files changed, 204 insertions(+)
+ create mode 100644 prisma/migrations/20261117120000_game_scores/migration.sql
+ create mode 100644 src/game/game.controller.ts
+ create mode 100644 src/game/game.module.ts
+ create mode 100644 src/game/game.service.ts
+ create mode 100644 src/game/zz-serve.ts
+
+diff --git a/.env.example b/.env.example
+index 42138e3..742124a 100644
+--- a/.env.example
++++ b/.env.example
+@@ -34,4 +34,6 @@ NODE_ENV="production"
+ MINI_APP_URL="https://app.otbozor.uz"
+ # Mini App admin paneliga kiradigan Telegram akkauntlar (ID, vergul bilan). Kirganda avtomatik admin bo'ladi
+ ADMIN_TELEGRAM_IDS="123456789"
++# "Otbozor Poyga" o'yini boti (@otbozor_game) tokeni: o'yin reytingi natijalarni shu bilan tekshiradi
++GAME_BOT_TOKEN="your-game-bot-token"
+ API_URL="https://your-backend-url.onrender.com"
+diff --git a/prisma/migrations/20261117120000_game_scores/migration.sql b/prisma/migrations/20261117120000_game_scores/migration.sql
+new file mode 100644
+index 0000000..e3c7c4e
+--- /dev/null
++++ b/prisma/migrations/20261117120000_game_scores/migration.sql
+@@ -0,0 +1,19 @@
++-- CreateTable
++CREATE TABLE "game_scores" (
++    "id" TEXT NOT NULL,
++    "kind" TEXT NOT NULL,
++    "period" TEXT NOT NULL,
++    "telegram_user_id" BIGINT NOT NULL,
++    "name" TEXT NOT NULL,
++    "value" DOUBLE PRECISION NOT NULL,
++    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
++    "updated_at" TIMESTAMP(3) NOT NULL,
++
++    CONSTRAINT "game_scores_pkey" PRIMARY KEY ("id")
++);
++
++-- CreateIndex
++CREATE UNIQUE INDEX "game_scores_kind_period_telegram_user_id_key" ON "game_scores"("kind", "period", "telegram_user_id");
++
++-- CreateIndex
++CREATE INDEX "game_scores_kind_period_value_idx" ON "game_scores"("kind", "period", "value");
+diff --git a/prisma/schema.prisma b/prisma/schema.prisma
+index 2af74d4..07ddc64 100644
+--- a/prisma/schema.prisma
++++ b/prisma/schema.prisma
+@@ -1151,3 +1151,19 @@ model PushDevice {
+   @@index([userId])
+   @@map("push_devices")
+ }
++
++/// "Otbozor Poyga" o'yini (@otbozor_game Mini App) reytingi: har bir o'yinchining hafta/oy bo'yicha eng yaxshi natijasi
++model GameScore {
++  id             String   @id @default(uuid())
++  kind           String   /// race | kopkari
++  period         String   /// week:2026-W47 | month:2026-11
++  telegramUserId BigInt   @map("telegram_user_id")
++  name           String
++  value          Float    /// race: soniya (kam yaxshi), kopkari: halol soni (ko'p yaxshi)
++  createdAt      DateTime @default(now()) @map("created_at")
++  updatedAt      DateTime @updatedAt @map("updated_at")
++
++  @@unique([kind, period, telegramUserId])
++  @@index([kind, period, value])
++  @@map("game_scores")
++}
+diff --git a/src/app.module.ts b/src/app.module.ts
+index 4393f5e..9024b5b 100644
+--- a/src/app.module.ts
++++ b/src/app.module.ts
+@@ -31,6 +31,7 @@ import { ChatModule } from './chat/chat.module';
+ import { AuctionsModule } from './auctions/auctions.module';
+ import { NotificationsModule } from './notifications/notifications.module';
+ import { KopkariModule } from './kopkari/kopkari.module';
++import { GameModule } from './game/game.module';
+ 
+ @Module({
+     imports: [
+@@ -99,6 +100,9 @@ import { KopkariModule } from './kopkari/kopkari.module';
+ 
+         // Ko'pkari: ishtirokchilar va natijalar
+         KopkariModule,
++
++        // "Otbozor Poyga" o'yini (@otbozor_game) reytingi
++        GameModule,
+     ],
+ })
+ export class AppModule { }
+diff --git a/src/game/game.controller.ts b/src/game/game.controller.ts
+new file mode 100644
+index 0000000..e68fff5
+--- /dev/null
++++ b/src/game/game.controller.ts
+@@ -0,0 +1,51 @@
++import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common';
++import { ApiOperation, ApiTags } from '@nestjs/swagger';
++import { IsBoolean, IsIn, IsNumber, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
++import { GameKind, GamePeriod, GameService } from './game.service';
++
++class ScoreDto {
++    @IsString() @MaxLength(4096)
++    initData: string;
++
++    @IsIn(['race', 'kopkari'])
++    kind: GameKind;
++
++    @IsNumber() @Min(0) @Max(1000)
++    value: number;
++
++    // O'yin qo'shimcha ma'lumot yuboradi (hozircha saqlanmaydi)
++    @IsOptional() @IsString() @MaxLength(32) horse?: string;
++    @IsOptional() @IsString() @MaxLength(16) theme?: string;
++    @IsOptional() @IsBoolean() hurdles?: boolean;
++    @IsOptional() daily?: string | number;
++}
++
++class TopQuery {
++    @IsOptional() @IsIn(['race', 'kopkari'])
++    kind?: GameKind;
++
++    @IsOptional() @IsIn(['week', 'month'])
++    period?: GamePeriod;
++
++    @IsOptional() @IsString() @MaxLength(20)
++    me?: string;
++}
++
++@ApiTags("O'yin: Otbozor Poyga reytingi")
++@Controller('game')
++export class GameController {
++    constructor(private readonly game: GameService) { }
++
++    @Get('top')
++    @ApiOperation({ summary: 'Haftalik / oylik reyting (eng yaxshi 20 ta)' })
++    top(@Query() q: TopQuery) {
++        return this.game.top(q.kind || 'race', q.period || 'week', q.me);
++    }
++
++    @Post('score')
++    @HttpCode(200)
++    @ApiOperation({ summary: "Natija yuborish (Telegram initData bilan tekshiriladi)" })
++    score(@Body() b: ScoreDto) {
++        return this.game.submit(b.initData, b.kind, b.value);
++    }
++}
+diff --git a/src/game/game.module.ts b/src/game/game.module.ts
+new file mode 100644
+index 0000000..b9ef456
+--- /dev/null
++++ b/src/game/game.module.ts
+@@ -0,0 +1,9 @@
++import { Module } from '@nestjs/common';
++import { GameController } from './game.controller';
++import { GameService } from './game.service';
++
++@Module({
++    controllers: [GameController],
++    providers: [GameService],
++})
++export class GameModule { }
+diff --git a/src/game/game.service.ts b/src/game/game.service.ts
+new file mode 100644
+index 0000000..c4f064a
+--- /dev/null
++++ b/src/game/game.service.ts
+@@ -0,0 +1,93 @@
++import { BadRequestException, HttpException, HttpStatus, Injectable, ServiceUnavailableException, UnauthorizedException } from '@nestjs/common';
++import { ConfigService } from '@nestjs/config';
++import { PrismaService } from '../prisma/prisma.service';
++import { TelegramWebAppUser, verifyTelegramInitData } from '../auth/telegram-init-data';
++
++export type GameKind = 'race' | 'kopkari';
++export type GamePeriod = 'week' | 'month';
++
++/** race: kamroq soniya yaxshi; kopkari: ko'proq halol yaxshi */
++const RULES: Record<GameKind, { lowerIsBetter: boolean; ok: (v: number) => boolean; fmt: (v: number) => number }> = {
++    race: { lowerIsBetter: true, ok: (v) => v >= 30 && v <= 180, fmt: (v) => Math.round(v * 100) / 100 },
++    kopkari: { lowerIsBetter: false, ok: (v) => Number.isInteger(v) && v >= 0 && v <= 40, fmt: (v) => v },
++};
++const TZ_MS = 5 * 60 * 60 * 1000; // Toshkent vaqti
++
++/** Hafta (ISO) va oy kalitlari Toshkent vaqti bo'yicha */
++export function periodKeys(ts = Date.now()): Record<GamePeriod, string> {
++    const d = new Date(ts + TZ_MS);
++    const y = d.getUTCFullYear(), m = d.getUTCMonth() + 1;
++    const t = new Date(Date.UTC(y, d.getUTCMonth(), d.getUTCDate()));
++    const day = t.getUTCDay() || 7;
++    t.setUTCDate(t.getUTCDate() + 4 - day);
++    const wy = t.getUTCFullYear();
++    const w = Math.ceil(((t.getTime() - Date.UTC(wy, 0, 1)) / 86400000 + 1) / 7);
++    return { week: `week:${wy}-W${String(w).padStart(2, '0')}`, month: `month:${y}-${String(m).padStart(2, '0')}` };
++}
++
++function displayName(u: TelegramWebAppUser): string {
++    const first = String(u.first_name || u.username || 'Chavandoz').replace(/[\u0000-\u001f<>]/g, '').slice(0, 24);
++    return u.last_name ? `${first} ${String(u.last_name)[0]}.` : first;
++}
++
++@Injectable()
++export class GameService {
++    private readonly lastPost = new Map<number, number>();
++
++    constructor(private readonly prisma: PrismaService, private readonly config: ConfigService) { }
++
++    private user(initData: string): TelegramWebAppUser {
++        const token = this.config.get<string>('GAME_BOT_TOKEN');
++        if (!token) throw new ServiceUnavailableException('GAME_BOT_TOKEN sozlanmagan');
++        const parsed = initData && initData.length <= 4096 ? verifyTelegramInitData(initData, token) : null;
++        if (!parsed) throw new UnauthorizedException('bad initData');
++        return parsed.user;
++    }
++
++    async submit(initData: string, kind: GameKind, value: number) {
++        const rule = RULES[kind];
++        if (!rule || !rule.ok(value)) throw new BadRequestException('bad value');
++        const u = this.user(initData);
++        const now = Date.now();
++        if (now - (this.lastPost.get(u.id) || 0) < 8000) throw new HttpException('slow down', HttpStatus.TOO_MANY_REQUESTS);
++        this.lastPost.set(u.id, now);
++        if (this.lastPost.size > 50000) this.lastPost.clear();
++
++        const keys = periodKeys(now), v = rule.fmt(value), name = displayName(u), improved: Partial<Record<GamePeriod, boolean>> = {};
++        for (const per of ['week', 'month'] as GamePeriod[]) {
++            const where = { kind_period_telegramUserId: { kind, period: keys[per], telegramUserId: BigInt(u.id) } };
++            const cur = await this.prisma.gameScore.findUnique({ where });
++            if (cur && (rule.lowerIsBetter ? v >= cur.value : v <= cur.value)) continue;
++            await this.prisma.gameScore.upsert({ where, create: { kind, period: keys[per], telegramUserId: BigInt(u.id), name, value: v }, update: { name, value: v } });
++            improved[per] = true;
++        }
++        return { ok: true, improved };
++    }
++
++    async top(kind: GameKind, per: GamePeriod, meId?: string, limit = 20) {
++        const rule = RULES[kind];
++        const period = periodKeys()[per];
++        const order = rule.lowerIsBetter ? 'asc' : 'desc';
++        const where = { kind, period };
++        const [rows, total] = await Promise.all([
++            this.prisma.gameScore.findMany({ where, orderBy: [{ value: order }, { updatedAt: 'asc' }], take: limit }),
++            this.prisma.gameScore.count({ where }),
++        ]);
++        let me: { rank: number; value: number } | null = null;
++        if (meId && /^\d{1,20}$/.test(meId)) {
++            const mine = await this.prisma.gameScore.findUnique({ where: { kind_period_telegramUserId: { kind, period, telegramUserId: BigInt(meId) } } });
++            if (mine) {
++                const better = await this.prisma.gameScore.count({
++                    where: { ...where, OR: [{ value: rule.lowerIsBetter ? { lt: mine.value } : { gt: mine.value } }, { value: mine.value, updatedAt: { lt: mine.updatedAt } }] },
++                });
++                me = { rank: better + 1, value: mine.value };
++            }
++        }
++        return {
++            period: `${kind}:${period}`,
++            top: rows.map((r) => ({ name: r.name, value: r.value, me: !!meId && r.telegramUserId.toString() === meId })),
++            me,
++            total,
++        };
++    }
++}
+diff --git a/src/game/zz-serve.ts b/src/game/zz-serve.ts
+new file mode 100644
+index 0000000..4ee1468
+--- /dev/null
++++ b/src/game/zz-serve.ts
+@@ -0,0 +1,10 @@
++import { NestFactory } from '@nestjs/core';
++import { Module, ValidationPipe } from '@nestjs/common';
++import { ConfigModule } from '@nestjs/config';
++import { PrismaModule } from '../prisma/prisma.module';
++import { GameModule } from './game.module';
++@Module({ imports: [ConfigModule.forRoot({ isGlobal: true, ignoreEnvFile: true }), PrismaModule, GameModule] })
++class M {}
++(async () => { const app = await NestFactory.create(M, { logger: false });
++  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true, transformOptions: { enableImplicitConversion: true } }));
++  app.setGlobalPrefix('api'); await app.listen(5099); console.log('up'); })();
+-- 
+2.43.0
+
